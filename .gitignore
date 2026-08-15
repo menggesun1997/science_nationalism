@@ -116,6 +116,22 @@ desktop.ini
 
 
 # ------------------------------------------------------------
+# Superseded analyses — kept on disk, excluded from the release
+#
+# Each was replaced by a later specification. Excluding them keeps the
+# published repository unambiguous about which code produced the results.
+# ------------------------------------------------------------
+
+# Replaced by crimes_2015_2022/, which restricts the pre-treatment fit
+# window to 2015+. Referenced only from commented-out code.
+code/crimes_2022/
+
+# Abandoned variants reading original_completed_new.xlsx
+code/crimes_2015_2022/intl_ratio_new/
+code/crimes_2015_2022/total_publications_new/
+
+
+# ------------------------------------------------------------
 # Manuscript
 # ------------------------------------------------------------
 
