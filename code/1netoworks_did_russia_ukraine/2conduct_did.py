@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 import os
@@ -10,9 +18,9 @@ warnings.filterwarnings('ignore')
 
 
 # 数据路径
-data_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile'
-russia_data_path = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile/russia_west_east_tile.csv'
-ukraine_data_path = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile/ukraine_west_east_tile.csv'
+data_base_dir = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile")
+russia_data_path = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile/russia_west_east_tile.csv")
+ukraine_data_path = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile/ukraine_west_east_tile.csv")
 
 
 
@@ -300,7 +308,7 @@ if __name__ == "__main__":
     TREAT_YEAR = 2022  # 处理年份，可选: 2021, 2022等
     
     # 输出目录
-    output_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/did_results'
+    output_base_dir = str(CODE / "1netoworks_did_russia_ukraine/did_results")
     os.makedirs(output_base_dir, exist_ok=True)
     
     # 存储所有结果

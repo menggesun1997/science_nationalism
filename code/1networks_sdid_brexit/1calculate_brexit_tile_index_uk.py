@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -205,7 +213,7 @@ if __name__ == "__main__":
     non_eu_west_countries = ['UNITED STATES', 'CANADA', 'AUSTRALIA', 'NEW ZEALAND']
 
     # 设置分析参数
-    analyze_data_dir = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related'
+    analyze_data_dir = str(LEGACY_BREXIT)
     analyze_country_file = 'uk'
     analyze_country = 'uk'
     

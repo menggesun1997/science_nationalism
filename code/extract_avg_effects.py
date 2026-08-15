@@ -5,13 +5,21 @@
 生成 Excel 表格汇总
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import os
 from pathlib import Path
 import glob
 
 # 基础路径
-base_dir = Path('/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES')
+base_dir = Path(str(CODE))
 
 # 三个事件文件夹
 event_folders = {

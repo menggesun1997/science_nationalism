@@ -13,6 +13,14 @@
 - did_dummy: DID交互项（post_brexit * treated_country）
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import os
@@ -22,16 +30,16 @@ import os
 CONTROL_SELECTION_METHOD = 'two_stage'  # 默认使用两阶段方法
 
 # 数据文件路径
-raw_data_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt'
+raw_data_dir = str(CODE / "0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt")
 # PPML-DID控制选择结果文件（两阶段方法）
-ppml_did_results_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_uk/ppml_did_control_selection_results.xlsx'
+ppml_did_results_file = str(CODE / "2two_way_did_uk/ppml_did_control_selection_results.xlsx")
 # SCM结果文件（合成控制法）
-scm_results_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_uk/scm_control_selection_results.xlsx'
+scm_results_file = str(CODE / "2two_way_did_uk/scm_control_selection_results.xlsx")
 # 控制组合作数据文件（用于获取详细合作数据）
-control_cooperation_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_uk/control_group_cooperation_data.xlsx'
+control_cooperation_file = str(CODE / "2two_way_did_uk/control_group_cooperation_data.xlsx")
 
 # 输出文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_uk'
+output_dir = str(CODE / "2two_way_did_uk")
 output_file = f'{output_dir}/ppml_did_data.dta'  # Stata格式
 output_csv_file = f'{output_dir}/ppml_did_data.csv'  # CSV格式（备用）
 

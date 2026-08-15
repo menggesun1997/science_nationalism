@@ -11,14 +11,22 @@
 - ln_total_pub: 控制变量（合作伙伴国家总发文量的对数）
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import os
 
 # 数据文件路径
-input_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_eu_internal_control/control_group_cooperation_data.xlsx'
-countries_stats_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv'
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_eu_internal_control'
+input_file = str(CODE / "2ppml_did_eu_internal_control/control_group_cooperation_data.xlsx")
+countries_stats_file = str(CODE / "0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv")
+output_dir = str(CODE / "2ppml_did_eu_internal_control")
 
 # 输出文件路径
 output_csv = f'{output_dir}/ppml_data.csv'

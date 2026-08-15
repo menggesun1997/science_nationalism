@@ -1,4 +1,12 @@
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -95,7 +103,7 @@ def conduct_synthetic_control_did():
     使用Synthetic Control DID方法分析英国脱欧对合作比例差值的影响
     """
     # 读取数据
-    data_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/networks_sdid_brexit/merged_all_data.csv'
+    data_file = str(LEGACY_BREXIT / "networks_sdid_brexit/merged_all_data.csv")
     df = pd.read_csv(data_file)
     
     print("数据概览:")
@@ -196,7 +204,7 @@ def conduct_synthetic_control_did():
             print(f"效应变化: {post_mean - pre_mean:.4f}")
         
         # 保存结果
-        output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/networks_sdid_brexit/synthetic_control_results.csv'
+        output_file = str(LEGACY_BREXIT / "networks_sdid_brexit/synthetic_control_results.csv")
         results_df.to_csv(output_file, index=False)
         print(f"\n结果已保存到: {output_file}")
         
@@ -228,7 +236,7 @@ def conduct_synthetic_control_did():
         plt.tight_layout()
         
         # 保存图表
-        plot_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/networks_sdid_brexit/synthetic_control_plot.png'
+        plot_file = str(LEGACY_BREXIT / "networks_sdid_brexit/synthetic_control_plot.png")
         plt.savefig(plot_file, dpi=300, bbox_inches='tight')
         print(f"图表已保存到: {plot_file}")
         
@@ -280,7 +288,7 @@ def conduct_simple_did(df, brexit_year, treatment_unit, control_units):
     }
     
     simple_df = pd.DataFrame([simple_results])
-    simple_df.to_csv('/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/networks_sdid_brexit/simple_did_results.csv', index=False)
+    simple_df.to_csv(str(LEGACY_BREXIT / "networks_sdid_brexit/simple_did_results.csv"), index=False)
     
     return simple_df
 

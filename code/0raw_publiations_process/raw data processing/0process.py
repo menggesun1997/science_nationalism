@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 import os
@@ -5,8 +13,8 @@ import os
 # base_dir = '/root/autodl-tmp'
 # output_base_dir = '/root/autodl-tmp'
 
-base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/publications_raw_data'
-output_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data'
+base_dir = str(CODE / "0raw_publiations_process/publications_raw_data")
+output_base_dir = str(CODE / "0raw_publiations_process/brexit_experimental_data")
 
 def count_ost_country():
     # 读取原始数据

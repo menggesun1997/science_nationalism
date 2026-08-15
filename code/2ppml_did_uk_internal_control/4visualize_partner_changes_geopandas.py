@@ -5,6 +5,14 @@
 使用静态地图展示正向增长（红色）和负向增长（蓝色）
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -14,7 +22,7 @@ from matplotlib.cm import ScalarMappable
 import os
 
 # 数据文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_uk_internal_control'
+output_dir = str(CODE / "2ppml_did_uk_internal_control")
 coefficients_file = f'{output_dir}/partner_coefficients.csv'
 visualization_output_dir = f'{output_dir}/visualization_results'
 
@@ -706,7 +714,7 @@ def main():
     print("\n步骤9: 输出特定国家的合作比例数据...")
     try:
         # 读取特定国家的合作数据
-        specific_countries_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/uk_articles/uk_specific_countries_analysis.csv'
+        specific_countries_file = str(CODE / "0raw_publiations_process/uk_articles/uk_specific_countries_analysis.csv")
         specific_df = pd.read_csv(specific_countries_file)
         print(f"✅ 成功读取特定国家数据: {len(specific_df)} 年数据")
         

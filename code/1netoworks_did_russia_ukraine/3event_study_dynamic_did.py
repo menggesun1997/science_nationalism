@@ -5,6 +5,14 @@ Event Study / Dynamic DID Plot 分析
 专门用于分析俄罗斯和乌克兰的西方-东方合作比例差异
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import os
@@ -17,9 +25,9 @@ from matplotlib.lines import Line2D
 
 
 # 数据路径
-data_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile'
-russia_data_path = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile/russia_west_east_tile.csv'
-ukraine_data_path = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile/ukraine_west_east_tile.csv'
+data_base_dir = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile")
+russia_data_path = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile/russia_west_east_tile.csv")
+ukraine_data_path = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile/ukraine_west_east_tile.csv")
 
 # 分析设置
 TREAT_YEAR = 2022  # 处理年份
@@ -524,7 +532,7 @@ def create_parallel_trends_plot(data, treated_country, dep_var, treat_year, outp
 def main():
     """主函数"""
     # 输出目录
-    output_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/event_study_results'
+    output_base_dir = str(CODE / "1netoworks_did_russia_ukraine/event_study_results")
     os.makedirs(output_base_dir, exist_ok=True)
     
     print("=" * 80)

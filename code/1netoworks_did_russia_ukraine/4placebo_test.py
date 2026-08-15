@@ -5,6 +5,14 @@
 通过将处理年份提前到实际处理之前，验证DID估计的稳健性
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import os
@@ -15,9 +23,9 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # 数据路径
-data_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile'
-russia_data_path = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile/russia_west_east_tile.csv'
-ukraine_data_path = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/west_east_tile/ukraine_west_east_tile.csv'
+data_base_dir = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile")
+russia_data_path = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile/russia_west_east_tile.csv")
+ukraine_data_path = str(CODE / "1netoworks_did_russia_ukraine/west_east_tile/ukraine_west_east_tile.csv")
 
 # 分析设置
 REAL_TREAT_YEAR = 2022  # 真实的处理年份
@@ -415,7 +423,7 @@ def create_placebo_summary_plot(all_results, treated_country, dep_var, output_di
 def main():
     """主函数"""
     # 输出目录
-    output_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/1netoworks_did_russia_ukraine/placebo_test_results'
+    output_base_dir = str(CODE / "1netoworks_did_russia_ukraine/placebo_test_results")
     os.makedirs(output_base_dir, exist_ok=True)
     
     print("=" * 80)

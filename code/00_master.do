@@ -1,40 +1,87 @@
-*===========================================================*
-* 00_master.do
-* 主运行文件：按顺序跑完 6 个分析 do，然后合并出图
-* 在 Stata 中直接 do 这个文件即可一键生成 Figure 1
-*===========================================================*
+*===============================================================*
+* 00_master.do — Figure 1 end-to-end build
+*
+* Runs the six synthetic-control analyses behind Figure 1 panels a-l,
+* then combines them into the final figure.
+*
+*   Steps 1-2  Brexit          (2016)  panels a-d
+*   Steps 3-4  Crimea          (2014)  panels e-h
+*   Steps 5-6  Russia-Ukraine  (2022)  panels i-l
+*   Step  7    combine 12 panels -> code/picutres/figure1.pdf
+*
+* Usage — from the repository root:
+*     stata-mp -b do code/00_master.do
+* or from inside Stata:
+*     do "code/00_master.do"
+*
+* Requires: synth (SSC). config.do installs missing SSC packages.
+* Runtime: several hours; each synth call runs hundreds of placebo
+* permutations.
+*===============================================================*
 clear all
 set more off
 
-* ── 全局配色（所有子 do 通过全局宏共享颜色定义）─────────────────────────
-global C_EU    "0 114 178"      // #0072B2  深蓝（EU）
-global C_UK    "213 94 0"       // #D55E00  橙红（UK）
-global C_RU    "86 180 233"     // #56B4E9  浅蓝（Russia）
-global C_UA    "230 159 0"      // #E69F00  金黄（Ukraine）
-global C_SHADE "238 238 238"    // #EEEEEE  后处理期阴影
-global C_LINE  "68 68 68"       // #444444  干预线
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
 
-* ── 运行各子图分析 + 绘图 do ─────────────────────────────────────────────
+* The Okabe-Ito palette ($C_EU, $C_UK, $C_RU, $C_UA, $C_SHADE, $C_LINE)
+* is defined in config.do and shared by every panel do-file.
+
+* ── Run each panel's analysis + plotting do-file ─────────────────────────
 di as result "=== Step 1/6: Brexit – Total Publications (panels a, c) ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/Brexit-stata_external_try/total_publications/compare.do"
+do "$CODE/Brexit-stata_external_try/total_publications/compare.do"
 
 di as result "=== Step 2/6: Brexit – Intl. Ratio (panels b, d) ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/Brexit-stata_external_try/intl_ratio/compare_intl_ratio.do"
+do "$CODE/Brexit-stata_external_try/intl_ratio/compare_intl_ratio.do"
 
 di as result "=== Step 3/6: Crimea – Total Publications (panels e, g) ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes/total_publications/compare_total.do"
+do "$CODE/crimes/total_publications/compare_total.do"
 
 di as result "=== Step 4/6: Crimea – Intl. Ratio (panels f, h) ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes/intl_ratio/intl_ratio_compare.do"
+do "$CODE/crimes/intl_ratio/intl_ratio_compare.do"
 
 di as result "=== Step 5/6: War – Total Publications (panels i, k) ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes_2015_2022/total_publications/compare_total_2022.do"
+do "$CODE/crimes_2015_2022/total_publications/compare_total_2022.do"
 
 di as result "=== Step 6/6: War – Intl. Ratio (panels j, l) ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes_2015_2022/intl_ratio/intl_ratio_compare.do"
+do "$CODE/crimes_2015_2022/intl_ratio/intl_ratio_compare.do"
 
-* ── 合并并导出最终图 ─────────────────────────────────────────────────────
-di as result "=== Combining all 12 panels → Figure 1 ==="
-do "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/99_combine_figure1.do"
+* ── Combine panels and export the final figure ───────────────────────────
+di as result "=== Step 7/7: combining all 12 panels into Figure 1 ==="
+do "$CODE/99_combine_figure1.do"
 
-di as result "=== 完成！Figure 1 已保存至 code/picutres/figure1.pdf ==="
+di as result "=== Done. Figure 1 written to code/picutres/figure1.pdf ==="

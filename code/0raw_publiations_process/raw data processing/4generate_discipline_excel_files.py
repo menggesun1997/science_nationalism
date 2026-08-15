@@ -1,11 +1,19 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 import os
 
 # 定义路径
-base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data'
-disciplines_base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/disciplines_crimes_2014/disciplines'
-disciplines_base_dir_1 = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/disciplines_crimes/disciplines'
+base_dir = str(CODE / "0raw_publiations_process/brexit_experimental_data")
+disciplines_base_dir = str(CODE / "disciplines_crimes_2014/disciplines")
+disciplines_base_dir_1 = str(CODE / "disciplines_crimes/disciplines")
 
 # 学科名称映射：从学科名称到文件夹名称
 discipline_folder_map = {

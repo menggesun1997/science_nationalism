@@ -4,6 +4,14 @@
 可视化avg_effect数据
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +21,7 @@ matplotlib.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei', 'DejaVu 
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 # 基础路径
-base_dir = Path('/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES')
+base_dir = Path(str(CODE))
 
 # 读取数据
 df = pd.read_excel(base_dir / '学科avg_effect汇总.xlsx', sheet_name='详细数据')

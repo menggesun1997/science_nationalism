@@ -12,7 +12,45 @@ set more off
 
 * 1. 数据准备和变量定义
 * 1.1 导入数据
-local base_dir "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes_2015_2022"
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+local base_dir "$CODE/crimes_2015_2022"
 import excel "`base_dir'/original_completed.xlsx", sheet("Sheet1") firstrow clear
 save "`base_dir'/total_publications/processed_data.dta", replace
 local treated_year 2022
@@ -283,7 +321,7 @@ gen _shade_hi_russia = `y_hi_russia'
 gen _shade_lo_ukraine = `y_lo_ukraine'
 gen _shade_hi_ukraine = `y_hi_ukraine'
 
-local gph_dir "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/picutres/gph"
+local gph_dir "$CODE/picutres/gph"
 capture mkdir "`gph_dir'"
 
 * ── Panel i: War – Russia Total Publications ─────────────────────────────────

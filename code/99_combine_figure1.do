@@ -4,6 +4,44 @@
 *===========================================================*
 clear all
 set more off
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
 capture set scheme white_tableau
 capture graph set window fontface "Helvetica"
 graph set eps fontface "Helvetica"
@@ -11,8 +49,8 @@ graph set eps fontface "Helvetica"
 global C_SHADE "238 238 238"
 global C_GREY  "85 85 85"
 
-local gph_dir "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/picutres/gph"
-local out_dir "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/picutres"
+local gph_dir "$CODE/picutres/gph"
+local out_dir "$CODE/picutres"
 
 local missing 0
 foreach p in c d e f g h i j k l {

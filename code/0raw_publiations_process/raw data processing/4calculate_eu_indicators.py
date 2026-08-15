@@ -1,8 +1,16 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import os
 
 # 定义基础目录
-base_dir = '/Users/sunmengge/Dropbox/brexit_rawdata'
+base_dir = str(RAW_DATA_STORE)
 
 # 定义欧盟国家列表（2016年后的成员国，不包括英国）
 eu_countries = [
