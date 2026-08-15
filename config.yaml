@@ -1,0 +1,11 @@
+# Snakemake configuration
+#
+# Override on the command line without editing this file:
+#     snakemake --cores 4 --config stata=stata-se python=python3
+
+# Stata executable. Common alternatives: stata-se, stata, StataMP.
+# Must be on PATH and support batch mode (-b do file.do).
+stata: stata-mp
+
+# Python interpreter. Use the one where requirements.txt is installed.
+python: python3
