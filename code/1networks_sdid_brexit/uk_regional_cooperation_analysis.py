@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,8 +32,8 @@ def analyze_uk_regional_cooperation():
     china_country = ['CHINA']
     
     # 设置文件路径
-    data_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_articles.csv'
-    output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_regional_cooperation.csv'
+    data_file = str(LEGACY_BREXIT / "networks_uk/uk_articles.csv")
+    output_file = str(LEGACY_BREXIT / "networks_uk/uk_regional_cooperation.csv")
     
     print("开始分析英国与不同地区的国际合作...")
     
@@ -280,7 +288,7 @@ def plot_uk_regional_cooperation_line_chart(csv_file_path):
         # 我们需要计算每篇文章中实际包含的各地区合作比例
         
         # 读取原始数据重新计算
-        data_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_articles.csv'
+        data_file = str(LEGACY_BREXIT / "networks_uk/uk_articles.csv")
         df_raw = pd.read_csv(data_file)
         df_raw.columns = ['article_id', 'year', 'discipline', 'countries']
         
@@ -444,8 +452,8 @@ def plot_uk_specific_groups_line_chart():
         BRICS_Nations = ['INDIA', 'SOUTH AFRICA', 'BRAZIL', 'RUSSIA']
         
         # 设置文件路径
-        data_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_articles.csv'
-        output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_specific_groups_cooperation.csv'
+        data_file = str(LEGACY_BREXIT / "networks_uk/uk_articles.csv")
+        output_file = str(LEGACY_BREXIT / "networks_uk/uk_specific_groups_cooperation.csv")
         
         print("开始分析英国与特定群体的国际合作...")
         
@@ -658,7 +666,7 @@ if __name__ == "__main__":
     # 分析英国与不同地区的合作， 绘制堆叠面积图
     # print("开始分析英国与不同地区的国际合作...")
     # results_df = analyze_uk_regional_cooperation()
-    # output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_regional_cooperation.csv'
+    # output_file = str(LEGACY_BREXIT / "networks_uk/uk_regional_cooperation.csv")
     # print(f"\n开始绘制英国地区合作堆叠面积图...")
     # plot_path = plot_uk_regional_cooperation_stacked_area(output_file)
     # if plot_path:

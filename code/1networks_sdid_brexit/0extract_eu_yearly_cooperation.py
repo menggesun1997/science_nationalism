@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import os
 
@@ -18,8 +26,8 @@ def extract_eu_yearly_cooperation():
     ]
     
     # 设置文件路径
-    raw_data_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/article_pays_list.txt'
-    output_dir = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_eu'
+    raw_data_file = str(LEGACY_BREXIT / "article_pays_list.txt")
+    output_dir = str(LEGACY_BREXIT / "networks_eu")
     
     # 确保输出目录存在
     os.makedirs(output_dir, exist_ok=True)

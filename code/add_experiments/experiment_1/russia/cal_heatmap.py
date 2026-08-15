@@ -1,4 +1,12 @@
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 
 import pandas as pd
 import seaborn as sns
@@ -8,16 +16,16 @@ from matplotlib import colors
 from collections import defaultdict
 from typing import List, Tuple, Dict
 
-AGGREGATED_ARTICLES_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt"
+AGGREGATED_ARTICLES_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt")
 RUSSIA_NAME = "RUSSIAN FEDERATION"
-COUNTRIES_STATS_FILE = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv'
+COUNTRIES_STATS_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv")
 
 RUSSIA_NAME = "RUSSIAN FEDERATION"
 FOCAL_COUNTRY = RUSSIA_NAME
 FOCAL_LABEL = "Russia"
 FOCAL_FILE_PREFIX = "russia"
 
-base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_1/russia/'
+base_dir = str(CODE / "add_experiments/experiment_1/russia/")
 
 
 def parse_countries(country_str):

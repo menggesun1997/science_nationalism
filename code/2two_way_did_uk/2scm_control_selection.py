@@ -11,6 +11,14 @@
 4. 权重必须非负且和为1
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
@@ -19,7 +27,7 @@ import os
 from sklearn.linear_model import LinearRegression
 
 # 数据文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_uk'
+output_dir = str(CODE / "2two_way_did_uk")
 existing_file = f'{output_dir}/control_group_cooperation_data.xlsx'
 scm_output_file = f'{output_dir}/scm_control_selection_results.xlsx'
 

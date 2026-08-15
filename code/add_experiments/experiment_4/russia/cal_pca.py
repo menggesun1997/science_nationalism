@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -15,9 +23,9 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-PPML_DATA_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_russia_internal_control/ppml_data.xlsx"
+PPML_DATA_FILE = str(CODE / "2ppml_did_russia_internal_control/ppml_data.xlsx")
 RUSSIA_NAME = "RUSSIAN FEDERATION"
-COUNTRIES_STATS_FILE = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv'
+COUNTRIES_STATS_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv")
 
 
 # 定义时期
@@ -610,8 +618,7 @@ def plot_scree_plot(
 
     # 保存碎石图
     scree_output = (
-        "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/"
-        "add_experiments/experiment_4/russia/russia_pca_scree_plot.png"
+        str(CODE / "add_experiments/experiment_4/russia/russia_pca_scree_plot.png")
     )
     plt.savefig(scree_output, dpi=300, bbox_inches="tight")
     print(f"碎石图已保存到: {scree_output}")
@@ -876,7 +883,7 @@ def visualize_results(pca_result, countries, kmeans_labels, hierarchical_labels,
     plt.tight_layout()
     
     # 保存图片
-    output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_4/russia/russia_pca_clustering_results.png'
+    output_file = str(CODE / "add_experiments/experiment_4/russia/russia_pca_clustering_results.png")
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"可视化结果已保存到: {output_file}")
     
@@ -906,7 +913,7 @@ def save_results(countries, normalized_profiles, kmeans_labels, hierarchical_lab
     results_df = pd.DataFrame(results_data)
     
     # 保存到CSV
-    output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_4/russia/russia_pca_clustering_results.csv'
+    output_file = str(CODE / "add_experiments/experiment_4/russia/russia_pca_clustering_results.csv")
     results_df.to_csv(output_file, index=False)
     print(f"结果已保存到: {output_file}")
     
@@ -952,29 +959,25 @@ def main():
 
     # 5.3. 保存并查看 PC1 的 loadings（对每个年份的权重）
     pc1_loadings_output = (
-        "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/"
-        "add_experiments/experiment_4/russia/russia_pc1_loadings.csv"
+        str(CODE / "add_experiments/experiment_4/russia/russia_pc1_loadings.csv")
     )
     save_pc1_loadings(pca, years, pc1_loadings_output)
     
     # 5.3.1. 绘制 PC1 loadings 图
     pc1_loadings_plot_output = (
-        "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/"
-        "add_experiments/experiment_4/russia/russia_pc1_loadings.png"
+        str(CODE / "add_experiments/experiment_4/russia/russia_pc1_loadings.png")
     )
     plot_pc1_loadings(pca, years, pc1_loadings_plot_output)
     
     # 5.4. 保存并查看 PC2 的 loadings（对每个年份的权重）
     pc2_loadings_output = (
-        "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/"
-        "add_experiments/experiment_4/russia/russia_pc2_loadings.csv"
+        str(CODE / "add_experiments/experiment_4/russia/russia_pc2_loadings.csv")
     )
     save_pc2_loadings(pca, years, pc2_loadings_output)
     
     # 5.4.1. 绘制 PC2 loadings 图
     pc2_loadings_plot_output = (
-        "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/"
-        "add_experiments/experiment_4/russia/russia_pc2_loadings.png"
+        str(CODE / "add_experiments/experiment_4/russia/russia_pc2_loadings.png")
     )
     plot_pc2_loadings(pca, years, pc2_loadings_plot_output)
 

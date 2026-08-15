@@ -2,6 +2,14 @@
 # 绘制 Stata synth2 的 SCM 结果 (英国 Brexit, inflow).
 # 左图路径 + AVG EFFECT: nested 主估计
 # 右图 placebo gaps + MSPE-ratio p: placebo 步
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import csv
 import numpy as np
 import matplotlib
@@ -9,7 +17,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
-DIR = "C:/Users/91916/Dropbox/GitHub/sicence nationism/code/4scm_brexit_uk_openalex"
+DIR = str(CODE / "4scm_brexit_uk_openalex")
 T0 = 2016
 TRT = "GBR"
 NESTED_FRAME = f"{DIR}/results/scm_brexit_uk_nested_frame.csv"

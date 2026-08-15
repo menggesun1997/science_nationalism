@@ -4,8 +4,16 @@ import os
 import networkx as nx
 
 
-# base_dir = '/root/autodl-tmp/disciplines_brexit'
-base_dir = '/Users/sunmengge/Dropbox/brexit/cooperation_related'
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import LEGACY_BREXIT  # noqa: E402
+
+# Reads article_pays_list.txt, a licensed Clarivate/OST export that lived in a
+# standalone Brexit folder. Point SCIENCE_NATIONALISM_LEGACY_BREXIT at your
+# copy; see DATA.md.
+base_dir = str(LEGACY_BREXIT)
 
 def extract_years_cooperation_data():
     # 读取原始数据

@@ -5,6 +5,44 @@
 *===========================================================*
 clear all
 set more off
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
 capture set scheme white_tableau
 capture graph set window fontface "Helvetica"
 graph set eps fontface "Helvetica"
@@ -17,13 +55,13 @@ global C_SHADE "238 238 238"    // #EEEEEE
 global C_LINE  "68 68 68"       // #444444
 global C_GREY  "85 85 85"       // #555555
 
-local gph_dir "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/picutres/gph"
+local gph_dir "$CODE/picutres/gph"
 capture mkdir "`gph_dir'"
 
 *===========================================================*
 *  ROW 1: Brexit – Total Publications (panels a, c)
 *===========================================================*
-local d1 "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/Brexit-stata_external_try/total_publications"
+local d1 "$CODE/Brexit-stata_external_try/total_publications"
 local treated_year 2016
 local x_start_year 2005
 
@@ -103,7 +141,7 @@ drop eu_actual_k eu_synthetic_k uk_actual_k uk_synthetic_k _slo_eu _shi_eu _slo_
 *===========================================================*
 *  ROW 1: Brexit – Intl. Ratio (panels b, d)
 *===========================================================*
-local d2 "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/Brexit-stata_external_try/intl_ratio"
+local d2 "$CODE/Brexit-stata_external_try/intl_ratio"
 
 use "`d2'/eu_synth_results.dta", clear
 drop _Co_Number _W_Weight
@@ -177,7 +215,7 @@ drop _slo_b _shi_b _slo_d _shi_d
 *===========================================================*
 *  ROW 2: Crimea – Total Publications (panels e, g)
 *===========================================================*
-local d3 "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes/total_publications"
+local d3 "$CODE/crimes/total_publications"
 local treated_year 2014
 local x_start_year 2005
 
@@ -257,7 +295,7 @@ drop russia_actual_k russia_synthetic_k ukraine_actual_k ukraine_synthetic_k _sl
 *===========================================================*
 *  ROW 2: Crimea – Intl. Ratio (panels f, h)
 *===========================================================*
-local d4 "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes/intl_ratio"
+local d4 "$CODE/crimes/intl_ratio"
 
 use "`d4'/russia_synth_results.dta", clear
 drop _Co_Number _W_Weight
@@ -330,7 +368,7 @@ drop _slo_ru _shi_ru _slo_ua _shi_ua
 *===========================================================*
 *  ROW 3: War – Total Publications (panels i, k)
 *===========================================================*
-local d5 "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes_2015_2022/total_publications"
+local d5 "$CODE/crimes_2015_2022/total_publications"
 local treated_year 2022
 local x_start_year 2015
 
@@ -410,7 +448,7 @@ drop russia_actual_k russia_synthetic_k ukraine_actual_k ukraine_synthetic_k _sl
 *===========================================================*
 *  ROW 3: War – Intl. Ratio (panels j, l)
 *===========================================================*
-local d6 "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/crimes_2015_2022/intl_ratio"
+local d6 "$CODE/crimes_2015_2022/intl_ratio"
 
 use "`d6'/russia_synth_results.dta", clear
 drop _Co_Number _W_Weight

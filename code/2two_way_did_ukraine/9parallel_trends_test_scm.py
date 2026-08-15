@@ -5,6 +5,14 @@
 验证乌克兰与控制组在战前时期的平行趋势
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,7 +21,7 @@ from scipy import stats
 from sklearn.linear_model import LinearRegression
 
 # 数据文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_ukraine'
+output_dir = str(CODE / "2two_way_did_ukraine")
 scm_results_file = f'{output_dir}/scm_control_selection_results.xlsx'
 control_cooperation_file = f'{output_dir}/control_group_cooperation_data.xlsx'
 plot_dir = f'{output_dir}/scm_parallel_trends_plots'

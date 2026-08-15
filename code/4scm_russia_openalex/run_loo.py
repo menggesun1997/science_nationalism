@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import csv
+import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import matplotlib
@@ -11,7 +14,38 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-STATA = Path(r"C:\Program Files\Stata18\StataMP-64.exe")
+
+def find_stata() -> Path:
+    """Locate a Stata executable across platforms.
+
+    Override with the STATA_EXE environment variable:
+        export STATA_EXE=/usr/local/bin/stata-se
+    """
+    override = os.environ.get("STATA_EXE")
+    if override:
+        return Path(override)
+
+    for name in ("stata-mp", "stata-se", "stata", "StataMP-64", "StataSE-64"):
+        found = shutil.which(name)
+        if found:
+            return Path(found)
+
+    for candidate in (
+        Path("/Applications/Stata/StataMP.app/Contents/MacOS/stata-mp"),
+        Path("/Applications/Stata/StataSE.app/Contents/MacOS/stata-se"),
+        Path(r"C:\Program Files\Stata18\StataMP-64.exe"),
+        Path(r"C:\Program Files\Stata18\StataSE-64.exe"),
+    ):
+        if candidate.exists():
+            return candidate
+
+    sys.exit(
+        "Stata executable not found. Set STATA_EXE to its full path, e.g.\n"
+        "  export STATA_EXE=/usr/local/bin/stata-mp"
+    )
+
+
+STATA = find_stata()
 REPO_CODE = Path(__file__).resolve().parents[1]
 
 ISO_NAME = {
@@ -100,11 +134,12 @@ do "{dir_posix}/loo_one.do" "{excl}"
 
 
 def run_stata(driver: Path, cwd: Path) -> None:
-    log = cwd / "results" / "loo" / (driver.stem + ".log")
-    cmd = [str(STATA), "/e", "do", str(driver)]
+    # Batch-mode flag differs by platform: /e on Windows, -b elsewhere.
+    batch_flag = "/e" if os.name == "nt" else "-b"
+    cmd = [str(STATA), batch_flag, "do", str(driver)]
     print("RUNNING:", " ".join(cmd))
     subprocess.run(cmd, cwd=str(cwd), check=False)
-    # Stata writes log next to do-file by default when using /e do
+    # Stata writes the log next to the do-file in batch mode.
     print("finished", driver.name)
 
 

@@ -1,4 +1,12 @@
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 
 import pandas as pd
 import seaborn as sns
@@ -7,7 +15,7 @@ from collections import defaultdict
 from typing import List, Tuple, Dict
 
 
-PAPERS_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/uk_articles/uk_articles.txt"
+PAPERS_FILE = str(CODE / "0raw_publiations_process/uk_articles/uk_articles.txt")
 UK_NAME = "UNITED KINGDOM"
 
 
@@ -284,8 +292,7 @@ def run_for_period(
 
     title = f"UK collaborator probability heatmap ({start_year}-{end_year})"
     output_path = (
-        f"/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_1/uk/"
-        f"uk_collaborator_heatmap_{start_year}_{end_year}.png"
+        ffstr(CODE / "add_experiments/experiment_1/uk/uk_collaborator_heatmap_{start_year}_{end_year}.png")
     )
     plot_heatmap(heatmap_df, title, output_path)
     print(f"Saved heatmap to: {output_path}")
@@ -584,8 +591,7 @@ def main():
     counts1_aligned = counts1.reindex(index=h1_aligned.index, columns=h1_aligned.columns, fill_value=0.0)
     counts2_aligned = counts2.reindex(index=h2_aligned.index, columns=h2_aligned.columns, fill_value=0.0)
     diff_output = (
-        f"/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_1/uk/"
-        f"uk_collaborator_difference_2014_2016_vs_2022_2024.png"
+        ffstr(CODE / "add_experiments/experiment_1/uk/uk_collaborator_difference_2014_2016_vs_2022_2024.png")
     )
     plot_difference_heatmap(
         diff_df,
@@ -657,8 +663,7 @@ def main():
     
     # 保存到Excel
     excel_output = (
-        f"/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_1/uk/"
-        f"uk_collaborator_analysis_2014_2016_vs_2022_2024.xlsx"
+        ffstr(CODE / "add_experiments/experiment_1/uk/uk_collaborator_analysis_2014_2016_vs_2022_2024.xlsx")
     )
     save_to_excel(diff_df, h1_aligned, h2_aligned, counts1_aligned, counts2_aligned, analysis, excel_output)
     print("\n" + "="*60)

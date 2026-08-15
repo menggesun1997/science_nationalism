@@ -7,6 +7,14 @@
 2) Main model (2017-2024)
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +23,7 @@ import os
 # 设置英文字体
 plt.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
-base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_russia'
+base_dir = str(CODE / "2two_way_did_russia")
 
 def read_params_csv(path: str):
     """从 CSV 读取参数，包含 estimate, min95, max95, event_bin, rel_year 列。"""

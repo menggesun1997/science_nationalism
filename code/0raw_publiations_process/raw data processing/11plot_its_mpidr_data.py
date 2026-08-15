@@ -4,6 +4,14 @@
 # Same layout/logic as 10plot_its_own_data.py, one figure per provider.
 # Output: its_mpidr_data/its_mpidr_panel_<prov>.{png,pdf}
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import os
 import numpy as np
 import pandas as pd
@@ -12,7 +20,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code"
+ROOT = str(CODE)
 OUT = os.path.join(ROOT, "0raw_publiations_process", "raw data processing", "its_mpidr_data")
 os.makedirs(OUT, exist_ok=True)
 

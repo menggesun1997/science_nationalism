@@ -2,13 +2,21 @@
 # 绘制 Stata synth2 的 SCM 结果 (俄罗斯, WoS inflow).
 # 可视化从 2008 起 (与估计窗口一致; 2005-07 为冷启动零值, 不展示).
 # 供体池按 WoS 数据独立筛选, 不必与 OpenAlex 版国家名单一致.
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import csv
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-DIR = "C:/Users/91916/Dropbox/GitHub/sicence nationism/code/4scm_russia_wos"
+DIR = str(CODE / "4scm_russia_wos")
 T0 = 2022
 Y0 = 2008  # 图与 pre-MSPE 筛选起点 (同 scm_russia.do 的 mspeperiod)
 TRT = "RUS"

@@ -1,4 +1,12 @@
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 
 import pandas as pd
 import seaborn as sns
@@ -7,13 +15,13 @@ from collections import defaultdict
 from typing import List, Tuple, Dict
 
 
-PAPERS_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/ukraine_articles/ukraine_articles.txt"
+PAPERS_FILE = str(CODE / "0raw_publiations_process/ukraine_articles/ukraine_articles.txt")
 UKRAINE_NAME = "UKRAINE"
 FOCAL_COUNTRY = UKRAINE_NAME
 FOCAL_LABEL = "Ukraine"
 FOCAL_FILE_PREFIX = "ukraine"
 
-base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_1/ukraine/'
+base_dir = str(CODE / "add_experiments/experiment_1/ukraine/")
 
 
 def load_data(papers_file: str = PAPERS_FILE) -> pd.DataFrame:

@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -14,9 +22,9 @@ from scipy.spatial.distance import pdist, squareform
 import warnings
 warnings.filterwarnings('ignore')
 
-PAPERS_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/uk_articles/uk_articles.txt"
+PAPERS_FILE = str(CODE / "0raw_publiations_process/uk_articles/uk_articles.txt")
 UK_NAME = "UNITED KINGDOM"
-COUNTRIES_STATS_FILE = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv'
+COUNTRIES_STATS_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv")
 
 # 定义时期
 START_YEAR = 2010
@@ -429,7 +437,7 @@ def plot_scree_plot(explained_variance_all, cumulative_variance_all=None,
     plt.tight_layout()
     
     # 保存碎石图
-    scree_output = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_4/uk/uk_pca_scree_plot.png'
+    scree_output = str(CODE / "add_experiments/experiment_4/uk/uk_pca_scree_plot.png")
     plt.savefig(scree_output, dpi=300, bbox_inches='tight')
     print(f"碎石图已保存到: {scree_output}")
     
@@ -520,7 +528,7 @@ def visualize_results(pca_result, countries, kmeans_labels, hierarchical_labels,
     plt.tight_layout()
     
     # 保存图片
-    output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_4/uk/uk_pca_clustering_results.png'
+    output_file = str(CODE / "add_experiments/experiment_4/uk/uk_pca_clustering_results.png")
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"可视化结果已保存到: {output_file}")
     
@@ -550,7 +558,7 @@ def save_results(countries, normalized_profiles, kmeans_labels, hierarchical_lab
     results_df = pd.DataFrame(results_data)
     
     # 保存到CSV
-    output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_4/uk/uk_pca_clustering_results.csv'
+    output_file = str(CODE / "add_experiments/experiment_4/uk/uk_pca_clustering_results.csv")
     results_df.to_csv(output_file, index=False)
     print(f"结果已保存到: {output_file}")
     

@@ -12,7 +12,45 @@ set more off
 
 * 1. 数据准备和变量定义
 * 1.1 导入数据
-import excel "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/brexit_non_eu.xlsx", sheet("Sheet1") firstrow clear
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+import excel "$CODE/Brexit-stata_external_try/brexit_non_eu.xlsx", sheet("Sheet1") firstrow clear
 
 * 替换国家名称中的空格为下划线
 replace Country = subinstr(Country, " ", "_", .)
@@ -74,7 +112,7 @@ gen log_gdp_per_capita = log(gdp_per_capita + 1)
 gen log_rp = log(ResearchersinRD + 1)
 
 * 1.6 保存处理后的数据
-save "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/processed_data.dta", replace
+save "$CODE/Brexit-stata_external_try/intl_publications/processed_data.dta", replace
 
 
 * 2. UK合成控制分析
@@ -118,11 +156,11 @@ gen rmspe_ratio_uk = post_rmspe_uk / pre_rmspe_uk
 
 
 * 2.6 保存UK结果
-save "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/uk_synth_results.dta", replace
+save "$CODE/Brexit-stata_external_try/intl_publications/uk_synth_results.dta", replace
 
 * 3. EU合成控制分析
 * 3.1 准备EU分析数据
-use "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/processed_data.dta", clear
+use "$CODE/Brexit-stata_external_try/intl_publications/processed_data.dta", clear
 
 * 3.2 运行EU的合成控制分析
 synth log_pub_intl ///
@@ -164,12 +202,12 @@ gen rmspe_ratio_eu = post_rmspe_eu / pre_rmspe_eu
 
 
 * 3.7 保存EU结果
-save "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/eu_synth_results.dta", replace
+save "$CODE/Brexit-stata_external_try/intl_publications/eu_synth_results.dta", replace
 
 
 * 3.8 合并EU和UK结果进行对比可视化
-use "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/eu_synth_results.dta", clear
-merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/uk_synth_results.dta", nogenerate
+use "$CODE/Brexit-stata_external_try/intl_publications/eu_synth_results.dta", clear
+merge 1:1 Year using "$CODE/Brexit-stata_external_try/intl_publications/uk_synth_results.dta", nogenerate
 * 获取效应值
 sum eu_gap_pct if Year >= 2016
 local eu_effect = r(mean)
@@ -200,8 +238,8 @@ twoway (line eu_actual_real Year, lcolor("137 202 229") lwidth(medthick)) ///
               pos(11) ring(0) cols(1) region(style(none)) size(vsmall)) ///
        name(combined_comparison_real, replace)
 
-// graph export "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/combined_actual_vs_synthetic.eps", replace
-graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/Brexit-stata_external/intl_publications/combined_actual_vs_synthetic.png", ///
+// graph export "$CODE/Brexit-stata_external_try/total_publications/combined_actual_vs_synthetic.eps", replace
+graph export "$CODE/Brexit-stata_external_try/intl_publications/combined_actual_vs_synthetic.png", ///
        width(1200) height(800) replace
 
 // * 4. 安慰剂检验
@@ -209,7 +247,7 @@ graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_resul
 // foreach country of local control_countries {
 //     di "Processing `country'"
 //
-//     use "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/processed_data.dta", clear
+//     use "$CODE/Brexit-stata_external_try/total_publications/processed_data.dta", clear
 //
 //     * 获取当前国家的ID（改进版）
 //     qui sum country_id if Country == "`country'"
@@ -234,7 +272,7 @@ graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_resul
 //                   counit(`placebo_controls') ///
 //                   xperiod(2008(1)2015) ///
 //                   nested allopt ///
-//                   keep("/Users/sunmengge/Dropbox/Brexit-stata/total_publications/synth_`country'", replace)
+//                   keep("$CODE/Brexit-stata_external_try/total_publications/synth_`country'", replace)
 //         }
 //     }
 //     else {
@@ -246,13 +284,13 @@ graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_resul
 //                   counit(`placebo_controls') ///
 //                   xperiod(2008(1)2015) ///
 //                   nested allopt ///
-//                   keep("/Users/sunmengge/Dropbox/Brexit-stata/total_publications/synth_`country'", replace)
+//                   keep("$CODE/Brexit-stata_external_try/total_publications/synth_`country'", replace)
 //         }
 //     }
 //
 //     * 处理结果
 //     capture {
-//         use "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/synth_`country'", clear
+//         use "$CODE/Brexit-stata_external_try/total_publications/synth_`country'", clear
 //         rename _time Year
 //   
 //         gen actual_real = exp(_Y_treated) - 1
@@ -267,21 +305,21 @@ graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_resul
 //   
 //         keep Year gap_pct_effect_`country' gap_pct_`country' avg_gap_pct_`country'
 //         drop if missing(Year)
-//         save "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/gap_`country'", replace
+//         save "$CODE/Brexit-stata_external_try/total_publications/gap_`country'", replace
 //     }
 // }
 //
 // * 4.2 合并所有结果
-// use "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/gap_ARGENTINA", clear
+// use "$CODE/Brexit-stata_external_try/total_publications/gap_ARGENTINA", clear
 // foreach country of local control_countries {
 //     if "`country'" != "ARGENTINA" {
 //         capture {
-//             merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/gap_`country'", nogenerate
+//             merge 1:1 Year using "$CODE/Brexit-stata_external_try/total_publications/gap_`country'", nogenerate
 //         }
 //     }
 // }
-// merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/eu_synth_results.dta", nogenerate
-// merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/uk_synth_results.dta", nogenerate
+// merge 1:1 Year using "$CODE/Brexit-stata_external_try/total_publications/eu_synth_results.dta", nogenerate
+// merge 1:1 Year using "$CODE/Brexit-stata_external_try/total_publications/uk_synth_results.dta", nogenerate
 //
 // * 4.3 计算每个国家的RMSPE
 // foreach country of local control_countries {
@@ -395,5 +433,5 @@ graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_resul
 //        name(placebo_filtered, replace)
 //
 // * 导出图形
-// graph export "/Users/sunmengge/Dropbox/Brexit-stata/total_publications/placebo_filtered.png", ///
+// graph export "$CODE/Brexit-stata_external_try/total_publications/placebo_filtered.png", ///
 //        width(1200) height(800) replace

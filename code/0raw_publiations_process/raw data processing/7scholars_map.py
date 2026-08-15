@@ -5,6 +5,14 @@
 口径: 期间"年均在册学者数" (mean over 2005-2024), 避免逐年求和的重复计数与末年右删失。
 色标: 对数 (数值跨 1 ~ 数十万)。
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import warnings
 import numpy as np
@@ -18,7 +26,7 @@ import geopandas as gpd
 import cartopy.io.shapereader as shpreader
 
 warnings.filterwarnings('ignore')
-OUT = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/migration_output_mpidr'
+OUT = str(CODE / "0raw_publiations_process/migration_output_mpidr")
 YMIN, YMAX = 2005, 2024
 
 # MPIDR 风格连续色系: 浅蓝 -> 绿 -> 橄榄 -> 橙 -> 红 (低->高)

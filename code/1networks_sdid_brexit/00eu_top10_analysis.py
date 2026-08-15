@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,8 +28,8 @@ def analyze_eu_top10_cooperation():
     eu_countries_set = set(eu_countries)
     
     # 设置文件路径
-    data_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/eu_articles/eu_articles.txt'
-    output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/eu_articles/eu_top10_cooperation_analysis.csv'
+    data_file = str(CODE / "0raw_publiations_process/eu_articles/eu_articles.txt")
+    output_file = str(CODE / "0raw_publiations_process/eu_articles/eu_top10_cooperation_analysis.csv")
     
     print("开始分析欧盟与top10国家的国际合作...")
     

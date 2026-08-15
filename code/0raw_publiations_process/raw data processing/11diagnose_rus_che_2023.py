@@ -15,23 +15,31 @@
 运行(服务器):
   SCI_DATA_DIR=/path/to/raw SCI_OUT_DIR=/path/to/out python3 11diagnose_rus_che_2023.py
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import time
 import duckdb
 
 BASE = os.environ.get(
     'SCI_DATA_DIR',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw_data_2026')
+    str(CODE / "0raw_publiations_process/raw_data_2026"))
 AUTHOR_FILE = os.path.join(BASE, 'article_author_cntry_brexit.txt')
 PAPER_FILE = os.path.join(BASE, 'article_brexit.txt')
 
 OUT_DIR = os.environ.get(
     'SCI_OUT_DIR',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw data processing/migration_output_mpidr')
+    str(CODE / "0raw_publiations_process/raw data processing/migration_output_mpidr"))
 os.makedirs(OUT_DIR, exist_ok=True)
 CNTRY_CONVERT = os.environ.get(
     'SCI_CNTRY_CONVERT',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw data processing/cntry_convert.csv')
+    str(CODE / "0raw_publiations_process/raw data processing/cntry_convert.csv"))
 OUT_CSV = os.path.join(OUT_DIR, 'rus_che_2023_diagnosis.csv')
 
 YEAR_MIN, YEAR_MAX = 2005, 2024

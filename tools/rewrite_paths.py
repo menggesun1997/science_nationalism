@@ -28,13 +28,58 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 CODE = REPO / "code"
 
-# Ordered longest-first so that the more specific pattern wins.
+# Historical root directories, all of which map onto today's code/ tree.
+# The repository was renamed several times and moved between machines, and
+# each analysis originally lived in its own standalone folder before being
+# consolidated here. None of these paths exist any more, so scripts holding
+# them cannot run at all.
+#
+# Ordered longest-first so the more specific pattern wins.
 ROOTS = [
+    # Current locations
     "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code",
     "C:/Users/91916/Dropbox/GitHub/sicence nationism/code",
     "C:\\Users\\91916\\Dropbox\\GitHub\\sicence nationism\\code",
+
+    # Previous repository name
     "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES",
+
+    # Standalone folders, before consolidation. Mapped to their present
+    # location under code/ (verified file-by-file).
+    #
+    # stata_results/ held one subdirectory per analysis, and those names
+    # survive unchanged under code/ — except Brexit-stata_external, which
+    # was renamed Brexit-stata_external_try. Order matters: the rename must
+    # be matched before the generic prefix.
+    "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/"
+    "Brexit-stata_external:Brexit-stata_external_try",
+    "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results:.",
+    "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data:.",
+    "/Users/sunmengge/Desktop/SCM_STATA/Brexit:Brexit-stata_external_try",
+    "/Users/sunmengge/Desktop/SCM_STATA/crimes:crimes",
+    "/Users/sunmengge/Dropbox/Brexit-stata:Brexit-stata_external_try",
+    "/Users/sunmengge/Dropbox/crimes_2022:crimes_2022",
+    "/Users/sunmengge/Dropbox/crimes:crimes",
+    "/Users/sunmengge/Dropbox/disciplines_crimes_2014:disciplines_crimes_2014",
+    "/Users/sunmengge/Dropbox/disciplines_crimes:disciplines_crimes",
+    "/Users/sunmengge/Dropbox/disciplines_brexit:disciplines_brexit",
 ]
+
+
+def split_mapping(entry: str) -> tuple[str, str]:
+    """Split "oldroot:subdir" into (oldroot, subdir under code/).
+
+    A bare entry maps directly onto code/. Windows drive letters contain a
+    colon, so only split on the last one and require the tail to be a
+    relative path.
+    """
+    if ":" in entry:
+        head, _, tail = entry.rpartition(":")
+        # Reject a Windows drive letter ("C:/Users/..."): its tail starts
+        # with a separator and its head is a single character.
+        if head and len(head) > 1 and not tail.startswith(("/", "\\")):
+            return head, "" if tail == "." else tail
+    return entry, ""
 
 # Roots that denote the repository root rather than code/.
 REPO_ROOTS = [
@@ -72,8 +117,33 @@ def python_bootstrap(path: Path) -> str:
     )
 
 
+# A path literal split across lines by implicit string concatenation, e.g.
+#     "/Users/me/proj/"
+#     "sub/file.png"
+# Substituting str(CODE / ...) for the first part would break the implicit
+# join, so fold such runs into one literal before substituting.
+IMPLICIT_JOIN_RE = re.compile(
+    r"""(?P<q1>['"])(?P<a>(?:/Users/|[A-Za-z]:[/\\])[^'"\n]*)(?P=q1)"""
+    r"""(?P<gap>\s*\n\s*)(?P<f>f?)(?P<q2>['"])(?P<b>[^'"\n]*)(?P=q2)"""
+)
+
+
+def fold_implicit_joins(text: str) -> str:
+    """Merge multi-line implicit string concatenations into single literals."""
+    for _ in range(5):  # runs can be longer than two parts
+        new = IMPLICIT_JOIN_RE.sub(
+            lambda m: f'{m.group("f")}{m.group("q1")}{m.group("a")}{m.group("b")}{m.group("q1")}',
+            text,
+        )
+        if new == text:
+            break
+        text = new
+    return text
+
+
 def rewrite_python(text: str, path: Path) -> tuple[str, int]:
     n = 0
+    text = fold_implicit_joins(text)
 
     def sub_root(m: re.Match) -> str:
         nonlocal n
@@ -82,18 +152,20 @@ def rewrite_python(text: str, path: Path) -> tuple[str, int]:
         return f'CODE / f"{tail.lstrip("/")}"' if tail else "CODE"
 
     # Replace quoted string literals that begin with a known root.
-    for root in ROOTS:
+    for entry in ROOTS:
+        root, subdir = split_mapping(entry)
         pattern = re.compile(
             r"""(?P<q>['"])""" + re.escape(root) + r"""(?P<tail>[^'"]*)(?P=q)"""
         )
 
-        def repl(m: re.Match) -> str:
+        def repl(m: re.Match, subdir: str = subdir) -> str:
             nonlocal n
             n += 1
-            tail = m.group("tail").lstrip("/").lstrip("\\")
-            if not tail:
+            tail = m.group("tail").lstrip("/").lstrip("\\").replace("\\", "/")
+            joined = f"{subdir}/{tail}" if subdir and tail else (subdir or tail)
+            if not joined:
                 return "str(CODE)"
-            return f'str(CODE / "{tail}")'
+            return f'str(CODE / "{joined}")'
 
         text = pattern.sub(repl, text)
 
@@ -188,10 +260,10 @@ def rewrite_do(text: str, path: Path) -> tuple[str, int]:
     hops = len(rel_to_code.parts)
     config_rel = "/".join([".."] * hops + ["config.do"]) if hops else "config.do"
 
-    for root in ROOTS:
-        before = text
-        text = text.replace(root, "$CODE")
-        n += before.count(root)
+    for entry in ROOTS:
+        root, subdir = split_mapping(entry)
+        n += text.count(root)
+        text = text.replace(root, f"$CODE/{subdir}" if subdir else "$CODE")
 
     for root in REPO_ROOTS:
         before = text
@@ -275,16 +347,37 @@ def main() -> int:
     ap.add_argument(
         "--list",
         type=Path,
-        default=Path("/tmp/mainline.txt"),
-        help="file listing target scripts, one relative path per line",
+        help="file listing target scripts, one path relative to code/ per line",
+    )
+    ap.add_argument(
+        "--all",
+        action="store_true",
+        help="target every .py and .do under code/",
     )
     args = ap.parse_args()
 
-    targets = [
-        line.strip()
-        for line in args.list.read_text().splitlines()
-        if line.strip() and not line.startswith("#")
-    ]
+    if args.all:
+        paths = sorted(
+            list(CODE.rglob("*.py")) + list(CODE.rglob("*.do")),
+            key=lambda p: str(p),
+        )
+        skip = {"paths.py", "config.do"}
+        targets = [
+            str(p.relative_to(CODE))
+            for p in paths
+            if p.name not in skip
+            # Directories excluded from the release
+            and "crimes_2022" not in p.parts
+            and not any(part.endswith("_new") for part in p.parts)
+        ]
+    elif args.list:
+        targets = [
+            line.strip()
+            for line in args.list.read_text().splitlines()
+            if line.strip() and not line.startswith("#")
+        ]
+    else:
+        ap.error("pass either --all or --list FILE")
 
     total_files = 0
     total_subs = 0

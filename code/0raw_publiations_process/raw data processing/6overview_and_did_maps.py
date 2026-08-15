@@ -5,6 +5,14 @@
   图2  did_map_<FOCAL>.png    : PPML-DiD 逐伙伴 delta 世界地图 (流出|流入两面板)
 底图: cartopy Natural Earth 110m (ADM0_A3 = ISO3)。数据已是 ISO3。
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import warnings
 import numpy as np
@@ -18,8 +26,8 @@ import cartopy.io.shapereader as shpreader
 
 warnings.filterwarnings('ignore')
 
-OUT = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/migration_output_mpidr'
-CODE = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code'
+OUT = str(CODE / "0raw_publiations_process/migration_output_mpidr")
+CODE = str(CODE)
 YMIN, YMAX = 2008, 2024
 
 FOCALS = {

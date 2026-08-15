@@ -6,13 +6,21 @@
 #   - pre 二次项检验 (加 rel_year^2, 若显著 -> pre 弯曲, 非线性)
 #   - 全样本 ITS 的 Durbin-Watson (自相关诊断)
 #   - OLS vs Newey-West(HAC) 下 beta1 的 p 值对比
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from statsmodels.stats.stattools import durbin_watson
 
-ROOT = "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code"
+ROOT = str(CODE)
 FOCALS = [("uk", "GBR", 2016, "United Kingdom — Brexit (2016)"),
           ("russia", "RUS", 2022, "Russia — invasion (2022)"),
           ("ukraine", "UKR", 2022, "Ukraine — invasion (2022)")]

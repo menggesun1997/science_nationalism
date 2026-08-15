@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 
 def merge_all_data():
@@ -5,7 +13,9 @@ def merge_all_data():
     合并所有数据：original_data + uk和控制国家的tile数据
     """
     # 读取原始数据
-    original_data_dir = '/Users/sunmengge/Dropbox/brexit_data/clean data/Data completion copy/final_completed.xlsx'
+    # Originally a standalone Brexit data folder; now resolved relative to
+    # the licensed raw-data store (see DATA.md).
+    original_data_dir = str(RAW_DATA_STORE / 'final_completed.xlsx')
     original_data = pd.read_excel(original_data_dir)
     
     print("原始数据形状:", original_data.shape)
@@ -19,13 +29,13 @@ def merge_all_data():
     all_tile_data = []
     
     # 处理英国数据
-    uk_tile_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_uk/uk_eu_non_eu_west_tile.csv'
+    uk_tile_file = str(LEGACY_BREXIT / "networks_uk/uk_eu_non_eu_west_tile.csv")
     uk_tile_data = pd.read_csv(uk_tile_file)
     uk_tile_data['country'] = 'uk'
     all_tile_data.append(uk_tile_data)
     
     # 处理控制国家数据
-    control_countries_dir = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_countrol_countries_brexit'
+    control_countries_dir = str(LEGACY_BREXIT / "networks_countrol_countries_brexit")
     
     for country in countries_to_analyze[1:]:  # 跳过uk，因为已经处理了
         tile_file = f'{control_countries_dir}/{country}_eu_non_eu_west_tile.csv'
@@ -81,7 +91,7 @@ def merge_all_data():
     print("合并后数据列:", merged_data.columns.tolist())
     
     # 保存合并后的数据
-    output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/networks_sdid_brexit/merged_all_data.csv'
+    output_file = str(LEGACY_BREXIT / "networks_sdid_brexit/merged_all_data.csv")
     merged_data.to_csv(output_file, index=False)
     print(f"合并数据已保存到: {output_file}")
     

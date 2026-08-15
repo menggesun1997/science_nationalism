@@ -5,6 +5,13 @@ World Map: Western vs Eastern Camps
 Identify NATO countries and Shanghai Cooperation Organization countries with two colors
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE  # noqa: E402
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -216,7 +223,7 @@ SCO Members: {east_countries_list}"""
     plt.tight_layout()
     
     # Save chart
-    output_dir = '/Users/sunmengge/Documents/GitHub/Brexit/exps/cooperation related/netoworks_did_russia_ukraine'
+    output_dir = str(CODE / "1netoworks_did_russia_ukraine")
     import os
     os.makedirs(output_dir, exist_ok=True)
     filepath = os.path.join(output_dir, 'world_map_western_vs_eastern_camps.png')
@@ -292,7 +299,7 @@ def create_detailed_camp_analysis():
     plt.tight_layout()
     
     # Save chart
-    output_dir = '/Users/sunmengge/Documents/GitHub/Brexit/exps/cooperation related/netoworks_did_russia_ukraine'
+    output_dir = str(CODE / "1netoworks_did_russia_ukraine")
     import os
     os.makedirs(output_dir, exist_ok=True)
     filepath = os.path.join(output_dir, 'detailed_camp_analysis.png')

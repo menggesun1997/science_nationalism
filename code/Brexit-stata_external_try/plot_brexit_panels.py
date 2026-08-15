@@ -7,6 +7,14 @@ Reads pre-computed .dta results from Stata and plots:
   d: UK  · Intl. publication ratio
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import glob
 import os
 
@@ -18,10 +26,10 @@ import pandas as pd
 import pyreadstat
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-BASE = "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/Brexit-stata_external_try"
+BASE = str(CODE / "Brexit-stata_external_try")
 TP   = f"{BASE}/total_publications"
 IR   = f"{BASE}/intl_ratio"
-OUT  = "/Users/sunmengge/Downloads/figure1_brexit_panels.pdf"
+OUT  = f"{BASE}/figure1_brexit_panels.pdf"
 
 TREAT_YEAR = 2016
 EU_COLOR   = "#00339A"   # RGB(0, 51, 154)

@@ -31,6 +31,14 @@ https://doi.org/10.1038/s41597-024-03655-9 (Methods 节)
   其中 Pays 为国家全称 (大写, 如 RUSSIAN FEDERATION / UNITED KINGDOM / UKRAINE)。
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import os
 import time
 import duckdb
@@ -46,7 +54,7 @@ import duckdb
 # Clarivate->标准名 映射文件 (由 cntry_convert.xlsx 导出的两列 csv: Clarivate country, Country)
 CNTRY_CONVERT = os.environ.get(
     'SCI_CNTRY_CONVERT',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw data processing/cntry_convert.csv')
+    str(CODE / "0raw_publiations_process/raw data processing/cntry_convert.csv"))
 
 # 标准 Country 名 -> ISO3: 仅覆盖 pycountry 容易认错/认不出的 (尤其 Turkey 在新版 pycountry 模糊匹配会失败)
 STD2ISO3 = {
@@ -108,13 +116,13 @@ def build_iso3_map(country_names, clar2std):
 # 路径可用环境变量覆盖, 方便在服务器上运行 (默认指向本地 Mac 路径)
 BASE = os.environ.get(
     'SCI_DATA_DIR',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw_data_2026')
+    str(CODE / "0raw_publiations_process/raw_data_2026"))
 AUTHOR_FILE = os.path.join(BASE, 'article_author_cntry_brexit.txt')
 PAPER_FILE = os.path.join(BASE, 'article_brexit.txt')
 
 OUT_DIR = os.environ.get(
     'SCI_OUT_DIR',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw data processing/migration_output_mpidr')
+    str(CODE / "0raw_publiations_process/raw data processing/migration_output_mpidr"))
 os.makedirs(OUT_DIR, exist_ok=True)
 
 FLOWS_CSV = os.path.join(OUT_DIR, 'mpidr_country_flows.csv')         # from_country, to_country, year, n_migrations

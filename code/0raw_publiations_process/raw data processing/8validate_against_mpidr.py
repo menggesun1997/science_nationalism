@@ -13,20 +13,27 @@
 依赖: pandas, pyarrow, matplotlib; (可选) scipy / pycountry。
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import os
 import pandas as pd
 
 OUT_DIR = os.environ.get(
     'SCI_OUT_DIR',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/raw data processing/migration_output_mpidr')
+    str(CODE / "0raw_publiations_process/raw data processing/migration_output_mpidr"))
 OUR_MEASURES = os.path.join(OUT_DIR, 'mpidr_country_measures.csv')
 OUR_FLOWS = os.path.join(OUT_DIR, 'mpidr_country_flows.csv')
 
 # MPIDR 2026 V2 参考数据 (本地 CSV, 由用户提供; 含 OpenAlex 与 Scopus 两个来源)
 MPIDR_DATA_DIR = os.environ.get(
     'SCI_MPIDR_DIR',
-    '/Users/sunmengge/Dropbox/GitHub/sicence nationism/data/'
-    'Global-flows-and-rates-of-international-migration-of-scholars-2026_V2/data_processed/2026_V2')
+    str(REPO / "data/Global-flows-and-rates-of-international-migration-of-scholars-2026_V2/data_processed/2026_V2"))
 
 # 每个来源: (国家年度指标文件, 双边流文件)
 MPIDR_SOURCES = {

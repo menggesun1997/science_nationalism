@@ -13,11 +13,19 @@
   migration_prepost_{focal}_key.csv      重点国 + 欧盟汇总
   migration_prepost_all_key.csv          三国重点国合并 (raw data processing/)
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import numpy as np
 import pandas as pd
 
-CODE = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code'
+CODE = str(CODE)
 FLOWS = os.path.join(
     CODE, '0raw_publiations_process/migration_output_mpidr/mpidr_country_flows.csv')
 OUT_DIR = os.path.join(CODE, '0raw_publiations_process/raw data processing')

@@ -5,6 +5,14 @@ Event Study分析：使用SCM选择的控制组
 分析乌克兰在战争前后的动态效应
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # 数据文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_ukraine'
+output_dir = str(CODE / "2two_way_did_ukraine")
 ppml_data_file = f'{output_dir}/ppml_did_data.xlsx'
 event_study_output_dir = f'{output_dir}/event_study_results_scm'
 

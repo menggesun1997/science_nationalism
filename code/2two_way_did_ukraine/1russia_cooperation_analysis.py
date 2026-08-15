@@ -1,10 +1,18 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import numpy as np
 from collections import defaultdict
 import re
 
 # 数据文件路径
-analyze_data_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/russia_articles/russia_articles.txt'
+analyze_data_dir = str(CODE / "0raw_publiations_process/russia_articles/russia_articles.txt")
 
 df = pd.read_csv(
         analyze_data_dir,
@@ -198,7 +206,7 @@ print(f"合作文章数透视表形状: {cooperation_pivot.shape}")
 print(f"合作比例透视表形状: {ratio_pivot.shape}")
 
 # 输出到Excel
-output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_russia_ukraine/russia_cooperation_analysis_results.xlsx'
+output_file = str(CODE / "2two_way_did_russia_ukraine/russia_cooperation_analysis_results.xlsx")
 
 print(f"\n正在导出结果到Excel文件: {output_file}")
 

@@ -1,10 +1,18 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 from pathlib import Path
 import shutil
 
 from openpyxl import load_workbook
 
 
-ROOT = Path("/Users/sunmengge/Dropbox/GitHub/sicence nationism")
+ROOT = Path(str(REPO))
 WORKBOOKS = [
     ROOT / "code/Brexit-stata_external_try/brexit_non_eu.xlsx",
     ROOT / "code/crimes/original_completed.xlsx",

@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import os
 import glob
@@ -26,8 +34,8 @@ def calculate_eu_cooperation_metrics():
     non_eu_core_countries = ['UNITED STATES', 'CANADA', 'AUSTRALIA', 'NEW ZEALAND']
     
     # 设置文件路径
-    data_dir = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_eu'
-    output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_eu/eu_uk_non_eu_west_tile.csv'
+    data_dir = str(LEGACY_BREXIT / "networks_eu")
+    output_file = str(LEGACY_BREXIT / "networks_eu/eu_uk_non_eu_west_tile.csv")
     
     print("开始计算EU合作指标...")
     
@@ -212,7 +220,7 @@ if __name__ == "__main__":
     # metrics = calculate_eu_cooperation_metrics()
     
     # 绘制合作比例图表
-    output_file = '/Users/sunmengge/Dropbox/GitHub/Brexit/exps/cooperation related/experimental_data/Data/experimental_data/cooperation_related/networks_eu/eu_uk_non_eu_west_tile.csv'
+    output_file = str(LEGACY_BREXIT / "networks_eu/eu_uk_non_eu_west_tile.csv")
     print(f"\n开始绘制EU合作比例图表...")
     plot_path = plot_eu_cooperation_ratios(output_file)
     if plot_path:

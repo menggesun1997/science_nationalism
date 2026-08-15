@@ -7,6 +7,14 @@
 # beta1 < 0  => brain drain (net outflow jump) after the shock.
 # Output: its_forest/its_beta1_forest.{png,pdf} and its_beta1_summary.csv
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import os
 import numpy as np
 import pandas as pd
@@ -15,7 +23,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code"
+ROOT = str(CODE)
 OUT = os.path.join(ROOT, "0raw_publiations_process", "raw data processing", "its_forest")
 os.makedirs(OUT, exist_ok=True)
 

@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -6,7 +14,7 @@ from typing import List, Tuple, Dict
 import networkx as nx
 import numpy as np
 
-PAPERS_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/eu_articles/eu_articles.txt"
+PAPERS_FILE = str(CODE / "0raw_publiations_process/eu_articles/eu_articles.txt")
 EU_COUNTRIES = [
     'AUSTRIA', 'BELGIUM', 'BULGARIA', 'CROATIA', 'CYPRUS', 
     'CZECHIA', 'DENMARK', 'ESTONIA', 'FINLAND', 'FRANCE', 
@@ -16,7 +24,7 @@ EU_COUNTRIES = [
     'SPAIN', 'SWEDEN'
 ]
 EU_NAME = "EU"  # 网络中EU节点的名称
-COUNTRIES_STATS_FILE = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv'
+COUNTRIES_STATS_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv")
 
 # 定义两个时期
 PERIOD_1_START = 2014
@@ -442,7 +450,7 @@ def main():
     results_df = results_df.sort_values('Difference', ascending=False)
     
     # 保存结果
-    output_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_2/eu/eu_betweenness_results.csv'
+    output_file = str(CODE / "add_experiments/experiment_2/eu/eu_betweenness_results.csv")
     results_df.to_csv(output_file, index=False)
     print(f"\n结果已保存到: {output_file}")
     
@@ -471,7 +479,7 @@ def main():
     plt.legend()
     plt.tight_layout()
     
-    plot_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_2/eu/eu_betweenness_comparison.png'
+    plot_file = str(CODE / "add_experiments/experiment_2/eu/eu_betweenness_comparison.png")
     plt.savefig(plot_file, dpi=300, bbox_inches='tight')
     print(f"\n可视化图表已保存到: {plot_file}")
     
@@ -486,7 +494,7 @@ def main():
     plt.axvline(x=0, color='black', linestyle='--', linewidth=1)
     plt.tight_layout()
     
-    diff_plot_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_2/eu/eu_betweenness_difference.png'
+    diff_plot_file = str(CODE / "add_experiments/experiment_2/eu/eu_betweenness_difference.png")
     plt.savefig(diff_plot_file, dpi=300, bbox_inches='tight')
     print(f"差异图表已保存到: {diff_plot_file}")
     
@@ -494,7 +502,7 @@ def main():
     print("\n" + "="*60)
     print("生成第二时期的网络可视化")
     print("="*60)
-    network_plot_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/experiment_2/eu/eu_network_visualization_2022_2024.png'
+    network_plot_file = str(CODE / "add_experiments/experiment_2/eu/eu_network_visualization_2022_2024.png")
     visualize_network(G2, betweenness2, f'{PERIOD_2_START}-{PERIOD_2_END}', network_plot_file)
 
 

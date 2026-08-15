@@ -5,6 +5,14 @@ Small-multiples: 每年 流入 / 流出 / 净迁移 (流入-流出), 双 y 轴, 
 左轴: inflow (inmig, 绿) / outflow (outmig, 红) 人数
 右轴: net = inmig - outmig (黑), 含 0 参考线
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import warnings
 import numpy as np
@@ -16,7 +24,7 @@ from matplotlib.ticker import MaxNLocator, FuncFormatter
 from matplotlib.lines import Line2D
 
 warnings.filterwarnings('ignore')
-OUT = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/0raw_publiations_process/migration_output_mpidr'
+OUT = str(CODE / "0raw_publiations_process/migration_output_mpidr")
 YMIN, YMAX = 2008, 2024
 THR = 10000
 NCOL = 6

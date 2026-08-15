@@ -5,6 +5,14 @@
 使用静态地图展示正向增长（红色）和负向增长（蓝色）
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -14,7 +22,7 @@ from matplotlib.cm import ScalarMappable
 import os
 
 # 数据文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_eu_internal_control'
+output_dir = str(CODE / "2ppml_did_eu_internal_control")
 coefficients_file = f'{output_dir}/event_study_try/did_all_countries_results_stata.csv'
 visualization_output_dir = f'{output_dir}/event_study_try/visualization_results'
 threshold = 10

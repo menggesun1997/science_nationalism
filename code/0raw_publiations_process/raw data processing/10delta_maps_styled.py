@@ -8,6 +8,14 @@ delta_k 迁移份额地图 — 绘图逻辑与 event_study/visualize_map.py 完�
   delta_outflow_{focal}.png
   delta_nettilt_{focal}.png
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import warnings
 import numpy as np
@@ -22,7 +30,7 @@ import geopandas as gpd
 import cartopy.io.shapereader as shpreader
 
 warnings.filterwarnings('ignore')
-CODE = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code'
+CODE = str(CODE)
 FIGSIZE = (20, 12)
 CB_VMIN, CB_VMAX = -1.6, 1.6
 LINTHRESH, LINSCALE = 0.01, 0.1

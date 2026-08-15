@@ -5,6 +5,14 @@
 每个国家的数据（2015-2024年的paper_count）形成一个向量，使用PCA降维到2维
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,7 +21,7 @@ from sklearn.preprocessing import StandardScaler
 import os
 
 # 设置工作目录
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_russia_internal_control'
+output_dir = str(CODE / "2ppml_did_russia_internal_control")
 data_file = f'{output_dir}/ppml_data.xlsx'
 pca_output_dir = f'{output_dir}/event_study_try/countries_result/pca_results'
 start_year = 2005

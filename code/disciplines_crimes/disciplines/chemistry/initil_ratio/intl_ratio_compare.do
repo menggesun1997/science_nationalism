@@ -12,8 +12,46 @@ set more off
 
 * 1. 数据准备和变量定义
 * 1.1 导入数据
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
 local discipline "chemistry"
-local base_dir "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/disciplines_crimes/disciplines"
+local base_dir "$CODE/disciplines_crimes/disciplines"
 import excel "`base_dir'/`discipline'/discipline_`discipline'.xlsx", sheet("Sheet1") firstrow clear
 
 * 替换国家名称中的空格为下划线
@@ -202,7 +240,7 @@ graph export "`base_dir'/`discipline'/initil_ratio/war_`discipline'_ratio.pdf", 
 * 4.1 对每个控制组国家进行合成控制分析
 // foreach country of local control_countries {
 //     di "Processing `country'"
-//     use "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/processed_data.dta", clear
+//     use "$CODE/crimes_2022/intl_ratio/processed_data.dta", clear
 //     * 获取当前国家的ID
 //     qui sum country_id if Country == "`country'"
 //     local treat_id = r(mean)
@@ -229,7 +267,7 @@ graph export "`base_dir'/`discipline'/initil_ratio/war_`discipline'_ratio.pdf", 
 //               counit(`placebo_controls') ///
 //               xperiod(2008(1)2021) ///
 //               nested allopt ///
-//               keep("/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/synth_`country'.dta", replace)
+//               keep("$CODE/crimes_2022/intl_ratio/synth_`country'.dta", replace)
 //     }
 //   
 //     * 如果标准模型失败，尝试简化模型
@@ -241,13 +279,13 @@ graph export "`base_dir'/`discipline'/initil_ratio/war_`discipline'_ratio.pdf", 
 //                   counit(`placebo_controls') ///
 //                   xperiod(2008(1)2021) ///
 //                   nested allopt ///
-//                   keep("/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/synth_`country'.dta", replace)
+//                   keep("$CODE/crimes_2022/intl_ratio/synth_`country'.dta", replace)
 //         }
 //     }
 //   
 //     * 处理结果
 //     capture {
-//         use "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/synth_`country'.dta", clear
+//         use "$CODE/crimes_2022/intl_ratio/synth_`country'.dta", clear
 //         rename _time Year
 //         rename _Y_treated cc_actual
 //         rename _Y_synthetic cc_synthetic
@@ -260,21 +298,21 @@ graph export "`base_dir'/`discipline'/initil_ratio/war_`discipline'_ratio.pdf", 
 //  
 //         keep Year gap_`country' avg_gap_`country'
 //         drop if missing(Year)
-//         save "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/gap_`country'.dta", replace
+//         save "$CODE/crimes_2022/intl_ratio/gap_`country'.dta", replace
 //     }
 // }
 
 // * 4.2 合并所有结果
-// use "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/gap_ARGENTINA.dta", clear
+// use "$CODE/crimes_2022/intl_ratio/gap_ARGENTINA.dta", clear
 // foreach country of local control_countries {
 //     if "`country'" != "ARGENTINA" {
 //         capture {
-//             merge 1:1 Year using "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/gap_`country'.dta", nogenerate
+//             merge 1:1 Year using "$CODE/crimes_2022/intl_ratio/gap_`country'.dta", nogenerate
 //         }
 //     }
 // }
-// merge 1:1 Year using "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/ukraine_synth_results.dta", nogenerate
-// merge 1:1 Year using "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/russia_synth_results.dta", nogenerate
+// merge 1:1 Year using "$CODE/crimes_2022/intl_ratio/ukraine_synth_results.dta", nogenerate
+// merge 1:1 Year using "$CODE/crimes_2022/intl_ratio/russia_synth_results.dta", nogenerate
 //
 // * 4.3 计算每个国家的RMSPE
 // foreach country of local control_countries {
@@ -390,8 +428,8 @@ graph export "`base_dir'/`discipline'/initil_ratio/war_`discipline'_ratio.pdf", 
 //        name(placebo_filtered, replace)
 //
 // * 导出图形
-// graph export "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/placebo_filtered.png", ///
+// graph export "$CODE/crimes_2022/intl_ratio/placebo_filtered.png", ///
 //        width(1200) height(800) replace
 //
 // * 5.5 保存最终结果
-// save "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/final_results.dta", replace
+// save "$CODE/crimes_2022/intl_ratio/final_results.dta", replace

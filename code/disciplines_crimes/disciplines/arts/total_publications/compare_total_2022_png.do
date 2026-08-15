@@ -1,15 +1,53 @@
 clear all
 set more off
 
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
 local discipline arts
 
 
 * 1. 加载2014年的结果数据
-use "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/disciplines_crimes_2014/disciplines/`discipline'/total_publications/ukraine_synth_results.dta", clear
+use "$CODE/disciplines_crimes_2014/disciplines/`discipline'/total_publications/ukraine_synth_results.dta", clear
 rename ukraine_synthetic_real ukraine_synthetic_real_2014  // 先重命名2014年的变量
 rename ukraine_gap_pct ukraine_gap_pct_2014  // 重命名2014年的gap变量
 
-merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/disciplines_crimes_2014/disciplines/`discipline'/total_publications/russia_synth_results.dta", nogenerate
+merge 1:1 Year using "$CODE/disciplines_crimes_2014/disciplines/`discipline'/total_publications/russia_synth_results.dta", nogenerate
 rename russia_synthetic_real russia_synthetic_real_2014    // 重命名2014年的俄罗斯变量
 rename russia_gap_pct russia_gap_pct_2014    // 重命名2014年的gap变量
 
@@ -20,10 +58,10 @@ sum russia_gap_pct_2014 if Year >= 2014
 local russia_effect_2014 = r(mean)
 
 * 2. 加载2022年的结果并合并
-merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/disciplines_crimes/disciplines/`discipline'/total_publications/ukraine_synth_results.dta", nogenerate
+merge 1:1 Year using "$CODE/disciplines_crimes/disciplines/`discipline'/total_publications/ukraine_synth_results.dta", nogenerate
 rename ukraine_synthetic_real ukraine_synthetic_real_2022  // 重命名2022年的变量
 rename ukraine_gap_pct ukraine_gap_pct_2022  // 重命名2022年的gap变量
-merge 1:1 Year using "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/disciplines_crimes/disciplines/`discipline'/total_publications/russia_synth_results.dta", nogenerate
+merge 1:1 Year using "$CODE/disciplines_crimes/disciplines/`discipline'/total_publications/russia_synth_results.dta", nogenerate
 rename russia_synthetic_real russia_synthetic_real_2022    // 重命名2022年的变量
 rename russia_gap_pct russia_gap_pct_2022    // 重命名2022年的gap变量
 
@@ -65,6 +103,6 @@ twoway (line ukraine_actual_real Year, lcolor("137 202 229") lwidth(medthick)) /
               pos(11) ring(0) cols(1) region(style(none)) size(vsmall)) ///
        name(combined_comparison_real, replace)
 
-// graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/crimes_2022/total_publications/1combined_actual_vs_synthetic.eps", replace
-graph export "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/disciplines_crimes/disciplines/`discipline'/total_publications/1combined_actual_vs_synthetic.png", ///
+// graph export "$CODE/crimes_2022/total_publications/1combined_actual_vs_synthetic.eps", replace
+graph export "$CODE/disciplines_crimes/disciplines/`discipline'/total_publications/1combined_actual_vs_synthetic.png", ///
        width(1200) height(800) replace

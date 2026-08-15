@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 # Bar chart of positive SCM donor weights (Ukraine nested main estimate).
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-DIR = "C:/Users/91916/Dropbox/GitHub/sicence nationism/code/4scm_ukraine_openalex"
+DIR = str(CODE / "4scm_ukraine_openalex")
 
 # Nested main estimate weights from scm_ukraine.log
 weights = [

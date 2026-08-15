@@ -7,6 +7,44 @@ clear all
 set more off
 
 * 关闭现有日志文件（如果存在）
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
 capture log close
 
 * 开始日志记录
@@ -16,7 +54,7 @@ log using "analysis_log_final_v9.txt", replace
 * =============================================================================
 
 * 导入Excel数据：sheet "详细合作数据"；Y变量列名为 cooperation_ratio
-import excel using "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_russia/russia_cooperation_analysis_results.xlsx", sheet("详细合作数据") firstrow clear
+import excel using "$CODE/2two_way_did_russia/russia_cooperation_analysis_results.xlsx", sheet("详细合作数据") firstrow clear
 
 * 统一变量命名与类型
 capture confirm variable cooperation_ratio

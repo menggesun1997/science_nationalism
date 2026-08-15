@@ -12,7 +12,45 @@ set more off
 
 * 1. 数据准备和变量定义
 * 1.1 导入数据
-import excel "/Users/sunmengge/Dropbox/crimes_2022/original_completed.xlsx", sheet("Sheet1") firstrow clear
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+import excel "$CODE/crimes_2022/original_completed.xlsx", sheet("Sheet1") firstrow clear
 
 * 替换国家名称中的空格为下划线
 replace Country = subinstr(Country, " ", "_", .)
@@ -71,12 +109,12 @@ gen log_gdp_per_capita = log(gdp_per_capita + 1)
 gen log_rp = log(ResearchersinRD + 1)
 
 * 1.6 保存处理后的数据
-save "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/processed_data.dta", replace
+save "$CODE/crimes_2022/intl_ratio/processed_data.dta", replace
 
 
 * 2. UKRAINE合成控制分析
 * 2.1 准备UKRAINE分析数据
-use "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/processed_data.dta", clear
+use "$CODE/crimes_2022/intl_ratio/processed_data.dta", clear
 
 * 2.2 运行UKRAINE的合成控制分析
 synth intl_ratio ///
@@ -115,7 +153,7 @@ gen rmspe_ratio_ukraine = post_rmspe_ukraine / pre_rmspe_ukraine
 
 * 3.7 保存UKRAINE结果
 drop if missing(Year)  // 删除Year缺失的观测值
-save "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/ukraine_synth_results.dta", replace
+save "$CODE/crimes_2022/intl_ratio/ukraine_synth_results.dta", replace
 
 
 sum ukraine_gap if Year >= 2022
@@ -140,5 +178,5 @@ twoway (line ukraine_actual Year, lcolor(pink) lwidth(medthick)) ///
               pos(3) ring(1) cols(1) region(style(none)) size(vsmall)) ///
        name(combined_comparison, replace)
 
-graph export "/Users/sunmengge/Dropbox/crimes_2022/intl_ratio/UKRAINE_combined_actual_vs_synthetic.png", ///
+graph export "$CODE/crimes_2022/intl_ratio/UKRAINE_combined_actual_vs_synthetic.png", ///
        width(1200) height(800) replace

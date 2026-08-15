@@ -8,6 +8,14 @@ PPML-DiD 控制组选择流程（欧盟分析）
 - 第2阶段：RMSE最小化（基于增长轨迹）
 """
 
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
+
 import pandas as pd
 import numpy as np
 from scipy import stats
@@ -17,7 +25,7 @@ import os
 from collections import defaultdict
 
 # 数据文件路径
-raw_data_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt'
+raw_data_dir = str(CODE / "0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt")
 
 # 候选控制组国家（7个）
 candidate_countries = {
@@ -31,7 +39,7 @@ candidate_countries = {
 }
 
 # 输出文件路径
-output_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2two_way_did_eu'
+output_dir = str(CODE / "2two_way_did_eu")
 output_file = f'{output_dir}/ppml_did_control_selection_results.xlsx'
 
 # EU-27标识（用于数据处理）

@@ -4,7 +4,45 @@ clear all
 set more off
 
 * 设置工作目录
-cd "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_uk_internal_control"
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+cd "$CODE/2ppml_did_uk_internal_control"
 
 * 导入数据（只使用xlsx格式）
 capture confirm file "ppml_data.xlsx"
@@ -78,7 +116,7 @@ save `filtered_countries', replace
 
 * 另外导出一份为 Excel，便于后续查看 / 复用
 * 注意：如需更改保存路径，请修改下行文件名
-export excel using "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/2ppml_did_ukraine_internal_control/event_study_try/filtered_countries.xlsx", ///
+export excel using "$CODE/2ppml_did_ukraine_internal_control/event_study_try/filtered_countries.xlsx", ///
     sheet("filtered_countries") firstrow(variables) replace
 restore
 

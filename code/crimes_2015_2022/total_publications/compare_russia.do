@@ -12,7 +12,45 @@ set more off
 
 * 1. 数据准备和变量定义
 * 1.1 导入数据
-import excel "/Users/sunmengge/Dropbox/crimes_2022/original_completed.xlsx", sheet("Sheet1") firstrow clear
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+import excel "$CODE/crimes_2022/original_completed.xlsx", sheet("Sheet1") firstrow clear
 
 * 替换国家名称中的空格为下划线
 replace Country = subinstr(Country, " ", "_", .)
@@ -69,7 +107,7 @@ gen log_gdp_per_capita = log(gdp_per_capita + 1)
 gen log_rp = log(ResearchersinRD + 1)
 
 * 1.6 保存处理后的数据
-save "/Users/sunmengge/Dropbox/crimes_2022/total_publications/processed_data.dta", replace
+save "$CODE/crimes_2022/total_publications/processed_data.dta", replace
 
 
 * 2. RUSSIAN_FEDERATION合成控制分析
@@ -119,7 +157,7 @@ gen rmspe_ratio_russia = post_rmspe_russia / pre_rmspe_russia
 drop if missing(Year)  // 删除Year缺失的观测值
 
 * 2.6 保存RUSSIAN_FEDERATION结果
-save "/Users/sunmengge/Dropbox/crimes_2022/total_publications/russia_synth_results.dta", replace
+save "$CODE/crimes_2022/total_publications/russia_synth_results.dta", replace
 
 
 * 首先确保RMSPE值可用
@@ -147,5 +185,5 @@ twoway (line russia_actual_real Year, lcolor(cyan) lwidth(medthick)) ///
               pos(3) ring(1) cols(1) region(style(none)) size(vsmall)) ///
        name(combined_comparison_real, replace)
 
-graph export "/Users/sunmengge/Dropbox/crimes_2022/total_publications/combined_actual_vs_synthetic.png", ///
+graph export "$CODE/crimes_2022/total_publications/combined_actual_vs_synthetic.png", ///
        width(1200) height(800) replace

@@ -1,5 +1,43 @@
 * 首先加载russia数据
-use "/Users/sunmengge/Desktop/SCM_STATA/crimes/intl_publications/russia/russia_synth_results.dta", clear
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+use "$CODE/crimes/intl_publications/russia/russia_synth_results.dta", clear
 
 * 生成russia的gap
 // gen russia_gap = russia_actual - russia_synthetic
@@ -13,7 +51,7 @@ tempfile russia_data
 save `russia_data'
 
 * 加载ukraine数据
-use "/Users/sunmengge/Desktop/SCM_STATA/crimes/intl_publications/ukraine/ukraine_synth_results.dta", clear
+use "$CODE/crimes/intl_publications/ukraine/ukraine_synth_results.dta", clear
 
 * 生成ukraine的gap
 // gen ukraine_gap = ukraine_actual - ukraine_synthetic
@@ -53,7 +91,7 @@ twoway (line russia_actual Year, lcolor(blue) lwidth(thick)) ///
        name(synth_comparison, replace)
 
 * 保存图形
-graph export "/Users/sunmengge/Desktop/SCM_STATA/crimes/intl_publications/russia_ukraine_comparison.png", ///
+graph export "$CODE/crimes/intl_publications/russia_ukraine_comparison.png", ///
        width(1200) height(800) replace
 
 // * 如果您也想看差距图
@@ -73,5 +111,5 @@ graph export "/Users/sunmengge/Desktop/SCM_STATA/crimes/intl_publications/russia
 //        name(gap_comparison, replace)
 //
 // * 保存差距图
-// graph export "/Users/sunmengge/Desktop/SCM_STATA/Brexit/total_publications/uk_eu_gaps.png", ///
+// graph export "$CODE/Brexit-stata_external_try/total_publications/uk_eu_gaps.png", ///
 //        width(1200) height(800) replace

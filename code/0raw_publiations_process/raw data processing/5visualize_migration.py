@@ -7,6 +7,14 @@
   results/robustness_plot.png    阵营层 delta 跨设定稳健性
 并输出跨国汇总 migration_ppml_summary.csv
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import numpy as np
 import pandas as pd
@@ -14,7 +22,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-CODE_DIR = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code'
+CODE_DIR = str(CODE)
 FOLDERS = {
     'GBR (Brexit 2016)': ('3ppml_migration_did_uk_internal_control', 2016),
     'RUS (War 2022)':    ('3ppml_migration_did_russia_internal_control', 2022),

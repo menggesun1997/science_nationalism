@@ -1,6 +1,44 @@
 clear
 * 导入Excel数据
-import excel "/Users/sunmengge/Desktop/SCM_STATA/Brexit/brexit_non_eu.xlsx", sheet("Sheet1") firstrow clear
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+import excel "$CODE/Brexit-stata_external_try/brexit_non_eu.xlsx", sheet("Sheet1") firstrow clear
 
 encode Country, gen(id)
 xtset id Year
@@ -9,7 +47,7 @@ gen log_gdp_per_capita = log(gdp_per_capita + 1)
 gen log_rp = log(ResearchersinRD + 1)
 
 * 保存处理后的数据集，以便后续使用
-save "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/processed_data.dta", replace	
+save "$CODE/Brexit-stata_external_try/intl_ratio/eu/processed_data.dta", replace	
 
 * 对eu进行合成控制分析，处理年份为2016年
 synth intl_ratio ///
@@ -60,7 +98,7 @@ rename v_weight1 log_gdp_per_capita
 rename v_weight2 log_rp
 rename v_weight3 RD
 
-save "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/eu_synth_results.dta", replace
+save "$CODE/Brexit-stata_external_try/intl_ratio/eu/eu_synth_results.dta", replace
 
 * 绘制eu真实数据和合成数据对比图
 twoway (line eu_actual Year, lcolor(blue) lwidth(medthick)) ///
@@ -73,7 +111,7 @@ twoway (line eu_actual Year, lcolor(blue) lwidth(medthick)) ///
        xlabel(#10) ///
        graphregion(color(white)) bgcolor(white) ///
        name(eu_comparison, replace)
-graph export "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/eu_actual_vs_synthetic.png", width(1200) height(800) replace
+graph export "$CODE/Brexit-stata_external_try/intl_ratio/eu/eu_actual_vs_synthetic.png", width(1200) height(800) replace
 
 
 	
@@ -83,7 +121,7 @@ foreach country_code of numlist 1 2 3 4 5 7 8 9 10 11 12 13 14 15 16 17 18 20 {
     di "Processing country code: `country_code'"
 	
 	* 使用保存的处理后数据集，而不是每次都重新导入
-    use "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/processed_data.dta", clear
+    use "$CODE/Brexit-stata_external_try/intl_ratio/eu/processed_data.dta", clear
     xtset id Year  // 确保面板数据结构设置正确
  
     * 创建控制组列表，排除当前处理单位和EU(6)
@@ -103,7 +141,7 @@ foreach country_code of numlist 1 2 3 4 5 7 8 9 10 11 12 13 14 15 16 17 18 20 {
 				  counit(`control_list') ///
 				  xperiod(2005(1)2015) ///
 				  nested allopt ///
-				  keep("/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/synth_`country_code'", replace)
+				  keep("$CODE/Brexit-stata_external_try/intl_ratio/eu/synth_`country_code'", replace)
 		}
 	}
 	* 对其他国家进行合成控制分析
@@ -114,29 +152,29 @@ foreach country_code of numlist 1 2 3 4 5 7 8 9 10 11 12 13 14 15 16 17 18 20 {
 				  counit(`control_list') ///
 				  xperiod(2008(1)2015) 
 				  nested ///
-				  keep("/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/synth_`country_code'", replace)
+				  keep("$CODE/Brexit-stata_external_try/intl_ratio/eu/synth_`country_code'", replace)
 		}
 	}
 	
 	* 处理结果并创建gap文件
     capture {
-        use "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/synth_`country_code'", clear
+        use "$CODE/Brexit-stata_external_try/intl_ratio/eu/synth_`country_code'", clear
         rename _time Year
         gen gap_`country_code' = _Y_treated - _Y_synthetic
         keep Year gap_`country_code'
         drop if missing(Year)
-        save "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/gap_`country_code'", replace
+        save "$CODE/Brexit-stata_external_try/intl_ratio/eu/gap_`country_code'", replace
     }
 }
 
 * 合并所有gap文件和eu结果，计算RMSPE和比率
-use "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/gap_1", clear
+use "$CODE/Brexit-stata_external_try/intl_ratio/eu/gap_1", clear
 foreach country_code of numlist 2 3 4 5 7 8 9 10 11 12 13 14 15 16 17 18 20 {
     capture {
-        merge 1:1 Year using "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/gap_`country_code'", nogenerate
+        merge 1:1 Year using "$CODE/Brexit-stata_external_try/intl_ratio/eu/gap_`country_code'", nogenerate
     }
 }
-merge 1:1 Year using "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/eu_synth_results.dta", nogenerate
+merge 1:1 Year using "$CODE/Brexit-stata_external_try/intl_ratio/eu/eu_synth_results.dta", nogenerate
 
 * 计算eu的平均处理效应（2016年及以后）
 sum eu_gap if Year >= 2016
@@ -201,11 +239,11 @@ foreach country_code of numlist 1 2 3 4 5 7 8 9 10 11 12 13 14 15 16 17 18 20 {
 }
 
 * 保存包含所有gap和比率的数据集
-save "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/all_results_with_rmspe.dta", replace
+save "$CODE/Brexit-stata_external_try/intl_ratio/eu/all_results_with_rmspe.dta", replace
 
 ****************************************************************************************************************
 * 绘图部分
-use "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/all_results_with_rmspe.dta", clear
+use "$CODE/Brexit-stata_external_try/intl_ratio/eu/all_results_with_rmspe.dta", clear
 
 * 第一个preserve块：计算p值和筛选国家
 preserve
@@ -268,7 +306,7 @@ twoway (line gap_* Year, lpattern(dash) lcolor(gs12)) ///
        graphregion(color(white)) bgcolor(white) ///
        name(placebo_effects, replace)
 
-graph export "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/placebo_effects_all.png", ///
+graph export "$CODE/Brexit-stata_external_try/intl_ratio/eu/placebo_effects_all.png", ///
        width(1200) height(800) replace
 
 * 2. 创建filtered_list用于筛选后的图
@@ -291,7 +329,7 @@ twoway (line eu_gap Year, lwidth(thick) lcolor(blue)) ///
        graphregion(color(white)) bgcolor(white) ///
        name(placebo_effects_filtered, replace)
 
-graph export "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/placebo_effects_filtered.png", ///
+graph export "$CODE/Brexit-stata_external_try/intl_ratio/eu/placebo_effects_filtered.png", ///
        width(1200) height(800) replace
 
 * 3. 绘制比率图
@@ -323,7 +361,7 @@ preserve
            graphregion(color(white)) bgcolor(white) ///
            name(rmspe_ratio_filtered, replace)
     
-    graph export "/Users/sunmengge/Desktop/SCM_STATA/Brexit/intl_ratio/eu/post_pre_rmspe_ratio_filtered.png", ///
+    graph export "$CODE/Brexit-stata_external_try/intl_ratio/eu/post_pre_rmspe_ratio_filtered.png", ///
            width(1200) height(800) replace
 restore
 

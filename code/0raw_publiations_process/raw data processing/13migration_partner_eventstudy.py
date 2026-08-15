@@ -5,6 +5,14 @@
 
 运行: python3 13migration_partner_eventstudy.py [GBR|RUS|UKR|all]
 """
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import sys
 import warnings
@@ -17,7 +25,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 warnings.filterwarnings('ignore')
-CODE = '/Users/sunmengge/Dropbox/GitHub/sicence nationism/code'
+CODE = str(CODE)
 REL_MIN, REF = -6, -1
 PARTNER_LABEL = {
     'DEU': 'Germany', 'CHN': 'China', 'USA': 'United States',

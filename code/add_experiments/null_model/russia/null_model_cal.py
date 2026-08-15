@@ -1,3 +1,11 @@
+
+import sys
+from pathlib import Path
+
+# Resolve repository paths without hard-coding any absolute directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from paths import CODE, REPO, RAW_DATA_STORE, LEGACY_BREXIT  # noqa: E402
+
 import os
 import pandas as pd
 import seaborn as sns
@@ -8,18 +16,18 @@ from collections import defaultdict
 from typing import List, Tuple, Dict
 import networkx as nx
 
-AGGREGATED_ARTICLES_FILE = "/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt"
+AGGREGATED_ARTICLES_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/article_countries_aggregated.txt")
 # RUSSIA_NAME = "RUSSIAN FEDERATION"
-# COUNTRIES_STATS_FILE = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv'
+# COUNTRIES_STATS_FILE = str(CODE / "0raw_publiations_process/brexit_experimental_data/countries_yearly_statistics.csv")
 
-# russia_articles_file = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/0raw_publiations_process/russia_articles/russia_articles.txt'
+# russia_articles_file = str(CODE / "0raw_publiations_process/russia_articles/russia_articles.txt")
 
 RUSSIA_NAME = "RUSSIAN FEDERATION"
 FOCAL_COUNTRY = RUSSIA_NAME
 FOCAL_LABEL = "Russia"
 FOCAL_FILE_PREFIX = "russia"
 
-base_dir = '/Users/sunmengge/Dropbox/RUSSIA_UKRAIN_WAR_ALL_CODES/add_experiments/null_model/russia'
+base_dir = str(CODE / "add_experiments/null_model/russia")
 OUTPUT_DIR = os.path.join(base_dir, "outputs")
 EDGE_WEIGHT_THRESHOLD = 10
 

@@ -1,6 +1,44 @@
 clear
 * 导入Excel数据
-import excel "/Users/sunmengge/Desktop/SCM_STATA/crimes/original_completed.xlsx", sheet("Sheet1") firstrow clear
+
+* ── Path resolution ──────────────────────────────────────────────────────
+* Sets $ROOT, $CODE, $PAPER and the shared colour palette via code/config.do,
+* so no absolute path appears below. Resolution order:
+*   1. $CODE already set by a calling master do-file
+*   2. $SCIENCE_NATIONALISM_ROOT environment variable
+*   3. walk up from the working directory looking for code/config.do
+* If none succeed, set it manually once per session:
+*   global ROOT "/path/to/sicence nationism"
+*   do "$ROOT/code/config.do"
+capture confirm file "$CODE/config.do"
+if _rc {
+    local _cfg ""
+    local _env : environment SCIENCE_NATIONALISM_ROOT
+    if "`_env'" != "" {
+        capture confirm file "`_env'/code/config.do"
+        if !_rc local _cfg "`_env'/code/config.do"
+    }
+    if "`_cfg'" == "" {
+        local _d "`c(pwd)'"
+        forvalues _i = 1/12 {
+            capture confirm file "`_d'/code/config.do"
+            if !_rc {
+                local _cfg "`_d'/code/config.do"
+                continue, break
+            }
+            local _d = regexr("`_d'", "/[^/]+$", "")
+            if "`_d'" == "" continue, break
+        }
+    }
+    if "`_cfg'" == "" {
+        di as error "Cannot locate code/config.do. Set SCIENCE_NATIONALISM_ROOT"
+        di as error "or define global ROOT before running this file. See README.md."
+        exit 601
+    }
+    do "`_cfg'"
+}
+
+import excel "$CODE/crimes/original_completed.xlsx", sheet("Sheet1") firstrow clear
 
 encode Country, gen(id)
 xtset id Year
@@ -8,7 +46,7 @@ gen log_pub_total = log(pub_total + 1)
 gen log_gdp_per_capita = log(gdp_per_capita + 1)
 gen log_rp = log(ResearchersinRD + 1)
 * 保存处理后的数据集，以便后续使用
-save "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/processed_data.dta", replace	
+save "$CODE/crimes/total_publications/ukraine/processed_data.dta", replace	
 
 * 对ukraine进行合成控制分析，处理年份为2014年
 synth log_pub_total ///
@@ -58,7 +96,7 @@ svmat V, names(v_weight)
 rename v_weight1 log_gdp_per_capita
 rename v_weight2 log_rp
 rename v_weight3 RD
-save "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/ukraine_synth_results.dta", replace
+save "$CODE/crimes/total_publications/ukraine/ukraine_synth_results.dta", replace
 
 * 绘制ukraine真实数据和合成数据对比图
 twoway (line ukraine_actual Year, lcolor(blue) lwidth(medthick)) ///
@@ -71,7 +109,7 @@ twoway (line ukraine_actual Year, lcolor(blue) lwidth(medthick)) ///
        xlabel(#10) ///
        graphregion(color(white)) bgcolor(white) ///
        name(ukraine_comparison, replace)
-graph export "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/ukraine_actual_vs_synthetic.png", width(1200) height(800) replace
+graph export "$CODE/crimes/total_publications/ukraine/ukraine_actual_vs_synthetic.png", width(1200) height(800) replace
 
 
 * 假设每个控制组国家都是处理组，逐个遍历进行合成控制
@@ -80,7 +118,7 @@ foreach country_code of numlist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 
     di "Processing country code: `country_code'"
 	
 	* 使用保存的处理后数据集，而不是每次都重新导入
-    use "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/processed_data.dta", clear
+    use "$CODE/crimes/total_publications/ukraine/processed_data.dta", clear
     xtset id Year  // 确保面板数据结构设置正确
 
     * 创建控制组列表，排除当前处理单位和ukraine(44)
@@ -95,46 +133,46 @@ foreach country_code of numlist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 
 	if `country_code' == 9 |`country_code' == 26 | `country_code' == 46 {
 	  	di "Using simplified model for problematic country code `country_code'"
 		capture noisily {
-			synth log_pub_total log_gdp_per_capita log_rp RD, trunit(`country_code') trperiod(2014) counit(`control_list') keep("/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/synth_`country_code'", replace)
+			synth log_pub_total log_gdp_per_capita log_rp RD, trunit(`country_code') trperiod(2014) counit(`control_list') keep("$CODE/crimes/total_publications/ukraine/synth_`country_code'", replace)
 		}
 	}
 	* 对其他国家进行合成控制分析
 	else {
 		capture noisily {
-			synth log_pub_total log_gdp_per_capita log_rp RD log_pub_total(2013) log_pub_total(2008(1)2013), trunit(`country_code') trperiod(2014) counit(`control_list')  keep("/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/synth_`country_code'", replace)
+			synth log_pub_total log_gdp_per_capita log_rp RD log_pub_total(2013) log_pub_total(2008(1)2013), trunit(`country_code') trperiod(2014) counit(`control_list')  keep("$CODE/crimes/total_publications/ukraine/synth_`country_code'", replace)
 		}
 	}
 	
 	* 处理结果并创建gap文件
     capture {
-        use "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/synth_`country_code'", clear
+        use "$CODE/crimes/total_publications/ukraine/synth_`country_code'", clear
         rename _time Year
         gen gap_`country_code' = _Y_treated - _Y_synthetic
         keep Year gap_`country_code'
         drop if missing(Year)
-        save "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/gap_`country_code'", replace
+        save "$CODE/crimes/total_publications/ukraine/gap_`country_code'", replace
     }
 }
 
 * 1. 先处理 ukraine_synth_results.dta 的重复值
-use "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/ukraine_synth_results.dta", clear
+use "$CODE/crimes/total_publications/ukraine/ukraine_synth_results.dta", clear
 * 检查重复值
 duplicates list Year
 * 保留每个年份的第一个观察值
 bysort Year: keep if _n == 1
 * 保存处理后的数据
-save "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/ukraine_synth_results_clean.dta", replace
+save "$CODE/crimes/total_publications/ukraine/ukraine_synth_results_clean.dta", replace
 
 
 
 * 合并所有gap文件和ukraine结果，计算RMSPE和比率
-use "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/gap_1", clear
+use "$CODE/crimes/total_publications/ukraine/gap_1", clear
 foreach country_code of numlist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 36 37 38 39 40 41 42 43 45 46{
     capture {
-        merge 1:1 Year using "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/gap_`country_code'", nogenerate
+        merge 1:1 Year using "$CODE/crimes/total_publications/ukraine/gap_`country_code'", nogenerate
     }
 }
-merge 1:1 Year using "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/ukraine_synth_results_clean.dta", nogenerate
+merge 1:1 Year using "$CODE/crimes/total_publications/ukraine/ukraine_synth_results_clean.dta", nogenerate
 
 * 计算ukraine的平均处理效应（2014年及以后）
 sum ukraine_gap if Year >= 2014
@@ -199,11 +237,11 @@ foreach country_code of numlist 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 
 }
 
 * 保存包含所有gap和比率的数据集
-save "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/all_results_with_rmspe.dta", replace
+save "$CODE/crimes/total_publications/ukraine/all_results_with_rmspe.dta", replace
 
 ****************************************************************************************************************
 * 绘图部分
-use "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/all_results_with_rmspe.dta", clear
+use "$CODE/crimes/total_publications/ukraine/all_results_with_rmspe.dta", clear
 * 第一个preserve块：计算p值和筛选国家
 preserve
     * 只保留每个国家的第一个观测值
@@ -265,7 +303,7 @@ twoway (line gap_* Year, lpattern(dash) lcolor(gs12)) ///
        graphregion(color(white)) bgcolor(white) ///
        name(placebo_effects, replace)
 
-graph export "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/placebo_effects_all.png", ///
+graph export "$CODE/crimes/total_publications/ukraine/placebo_effects_all.png", ///
        width(1200) height(800) replace
 
 * 2. 创建filtered_list用于筛选后的图
@@ -288,7 +326,7 @@ twoway (line ukraine_gap Year, lwidth(thick) lcolor(blue)) ///
        graphregion(color(white)) bgcolor(white) ///
        name(placebo_effects_filtered, replace)
 
-graph export "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/placebo_effects_filtered.png", ///
+graph export "$CODE/crimes/total_publications/ukraine/placebo_effects_filtered.png", ///
        width(1200) height(800) replace
 
 * 3. 绘制比率图
@@ -320,6 +358,6 @@ preserve
            graphregion(color(white)) bgcolor(white) ///
            name(rmspe_ratio_filtered, replace)
     
-    graph export "/Users/sunmengge/Desktop/SCM_STATA/crimes/total_publications/ukraine/post_pre_rmspe_ratio_filtered.png", ///
+    graph export "$CODE/crimes/total_publications/ukraine/post_pre_rmspe_ratio_filtered.png", ///
            width(1200) height(800) replace
 restore
