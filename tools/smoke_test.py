@@ -210,13 +210,35 @@ ANCHORS = {
 # Extensions worth checking; skip outputs and globs.
 DATA_EXT = {".csv", ".xlsx", ".xls", ".txt", ".parquet", ".dta", ".shp", ".json"}
 
+# Assignment to a name that denotes an output, or a write call on the same line.
+WRITE_HINT_RE = re.compile(
+    r"(?:out(?:put)?\w*|save\w*|dest\w*|target\w*)\s*(?:_\w+)?\s*=\s*$"
+    r"|to_(?:csv|excel|parquet|stata)\s*\($"
+    r"|savefig\s*\($",
+    re.IGNORECASE,
+)
+
+
+def is_write_target(src: str, pos: int) -> bool:
+    """True when the path literal at ``pos`` is being written, not read."""
+    line_start = src.rfind("\n", 0, pos) + 1
+    prefix = src[line_start:pos]
+    # Strip the wrapper that precedes the anchor, e.g. 'str(' or 'Path('.
+    prefix = re.sub(r"(?:str|Path|os\.fspath)\s*\($", "", prefix.rstrip())
+    return bool(WRITE_HINT_RE.search(prefix.rstrip()))
+
 
 def check_declared_inputs(src: str, r: Result, path: Path) -> None:
     candidates: set[Path] = set()
 
     for m in ANCHOR_RE.finditer(src):
         anchor, tail = m.group(1), m.group(2)
+        # "{" marks an f-string placeholder resolved at run time.
         if "*" in tail or "{" in tail:
+            continue
+        # Distinguish reads from writes: a path only ever written to is an
+        # output, and its absence is expected before the script runs.
+        if is_write_target(src, m.start()):
             continue
         p = ANCHORS[anchor] / tail
         if p.suffix.lower() in DATA_EXT:
@@ -255,6 +277,10 @@ DO_READ_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Stata local/global macros expand at run time, so a path containing one cannot
+# be checked statically: `discipline' and `country' are loop variables.
+STATA_MACRO_RE = re.compile(r"`|\$\{?\w")
+
 
 def check_do(path: Path, installed: dict[str, bool] | None) -> Result:
     rel = str(path.relative_to(CODE))
@@ -281,14 +307,12 @@ def check_do(path: Path, installed: dict[str, bool] | None) -> Result:
 
     for m in DO_READ_RE.finditer(src):
         raw = m.group(1)
-        if raw.startswith("$"):
-            expanded = raw.replace("$CODE", str(CODE)).replace("$ROOT", str(REPO))
-            if "$" in expanded:
-                continue
-            p = Path(expanded)
-        elif Path(raw).is_absolute():
-            p = Path(raw)
-        else:
+        expanded = raw.replace("$CODE", str(CODE)).replace("$ROOT", str(REPO))
+        # Any macro left over expands only at run time; skip such paths.
+        if STATA_MACRO_RE.search(expanded):
+            continue
+        p = Path(expanded)
+        if not p.is_absolute():
             continue
         if p.suffix.lower() not in DATA_EXT:
             continue
