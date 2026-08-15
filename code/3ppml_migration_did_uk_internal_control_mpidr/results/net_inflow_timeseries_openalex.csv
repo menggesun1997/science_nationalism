@@ -1,0 +1,16 @@
+focal,provider,year,rel_year,inflow,outflow,net_inflow,post
+GBR,openalex,2008,-8,17711,18532,-821,0
+GBR,openalex,2009,-7,18535,19720,-1185,0
+GBR,openalex,2010,-6,19624,21055,-1431,0
+GBR,openalex,2011,-5,19811,22568,-2757,0
+GBR,openalex,2012,-4,20693,24009,-3316,0
+GBR,openalex,2013,-3,22230,24759,-2529,0
+GBR,openalex,2014,-2,23528,25260,-1732,0
+GBR,openalex,2015,-1,24544,25684,-1140,0
+GBR,openalex,2016,0,25068,26282,-1214,1
+GBR,openalex,2017,1,25869,27251,-1382,1
+GBR,openalex,2018,2,26565,28999,-2434,1
+GBR,openalex,2019,3,28235,29614,-1379,1
+GBR,openalex,2020,4,26451,27626,-1175,1
+GBR,openalex,2021,5,28724,32763,-4039,1
+GBR,openalex,2022,6,32143,38048,-5905,1

@@ -1,0 +1,16 @@
+focal,provider,year,rel_year,inflow,outflow,net_inflow,post
+RUS,scopus,2008,-14,541,784,-243,0
+RUS,scopus,2009,-13,588,781,-193,0
+RUS,scopus,2010,-12,597,790,-193,0
+RUS,scopus,2011,-11,584,771,-187,0
+RUS,scopus,2012,-10,574,740,-166,0
+RUS,scopus,2013,-9,613,717,-104,0
+RUS,scopus,2014,-8,833,803,30,0
+RUS,scopus,2015,-7,946,794,152,0
+RUS,scopus,2016,-6,1002,802,200,0
+RUS,scopus,2017,-5,1075,926,149,0
+RUS,scopus,2018,-4,900,1088,-188,0
+RUS,scopus,2019,-3,856,1061,-205,0
+RUS,scopus,2020,-2,859,1168,-309,0
+RUS,scopus,2021,-1,812,1174,-362,0
+RUS,scopus,2022,0,784,1655,-871,1

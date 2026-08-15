@@ -1,0 +1,11 @@
+event_year,coef,se,ci_lower,ci_upper,significant,pvalue,sig_10,sig_05,sig_01,model_used,fe_spec,fe_explanation
+-7,-.02973647,.056295495,-.14007564,.080602698,0,.59734583,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+-6,-.011332019,.034551006,-.079051986,.05638795,0,.74292719,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+-5,.020950666,.034063812,-.045814406,.087715738,0,.53852713,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+-4,-.01136569,.024721021,-.05981889,.037087511,0,.64568985,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+-3,.0068889903,.020797921,-.033874936,.047652915,0,.74046731,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+-2,-.033191673,.028406199,-.088867821,.022484478,0,.24261892,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+-1,0,0,0,0,0,1,0,0,0,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+0,-.090028822,.031907544,-.15256761,-.027490038,1,.0047791745,1,1,1,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+1,-.43125591,.057723388,-.54439372,-.31811807,1,7.9491969e-14,1,1,1,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"
+2,-.54238391,.0708251,-.6812011,-.40356672,1,1.8873791e-14,1,1,1,1,pair_id + year,"pair_id = group(focal_id, partner_id), 每个焦点国-伙伴国配对一个固定效应"

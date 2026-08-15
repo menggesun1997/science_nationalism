@@ -1,0 +1,18 @@
+\begin{equation}\label{eq:gravity_separate}
+E[\text{Count}_{t}]_j = \exp\left( \beta_j \cdot \text{Post}_t + \ln(\text{Total}^{\text{Intl}}_{t}) + \gamma \cdot \ln(\text{Total}^{\text{Pub}}_{jt})  \right)
+\end{equation}
+
+In this specification:
+
+\begin{itemize}
+\item $E[\text{Count}_{t}]_j$ denotes the expected collaboration count with partner $j$ in year $t$.
+
+\item Note: We do not include year fixed effects ($\lambda_t$) because $\text{Post}_t$ is a linear combination of year indicators (all pre-war years have $\text{Post}_t=0$, all post-war years have $\text{Post}_t=1$), which would create perfect multicollinearity. By estimating separate regressions for each partner $j$, we implicitly allow partner-specific intercepts to vary across partners, while $\text{Post}_t$ captures the time-varying structural break.
+
+\item $\ln(\text{Total}^{\text{Intl}}_{t})$ is the offset variable (coefficient constrained to 1), representing the focal unit's total international collaboration volume. By including this, we explicitly model the \textit{share} of collaboration allocated to partner $j$. This effectively neutralizes the confounding effect of the focal unit's aggregate contraction (e.g., a systemic collapse due to sanctions), allowing $\beta_j$ to capture the \textit{reallocation} of the remaining scientific capacity.
+
+\item $\ln(\text{Total}^{\text{Pub}}_{jt})$ controls for partner $j$'s specific scientific mass. The coefficient $\gamma$ is common across all partners, assuming a uniform elasticity of collaboration with respect to partner scientific output. This specification allows us to control for partner-specific scientific growth while maintaining parsimony in the model.
+
+\item $\beta_j$ is the coefficient of interest, estimated separately for each partner $j$ through partner-specific regressions. It captures the structural break in the bilateral relationship triggered by the event. A positive $\beta_j$ indicates that the partner's share in the focal unit's portfolio increased relative to the baseline expectation, signifying ``relative resilience" or an ``active pivot", whereas a negative coefficient implies ``active decoupling" exceeding the aggregate contraction.
+\end{itemize}
+

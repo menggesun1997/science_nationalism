@@ -1,0 +1,3 @@
+treatment_country,variable,slope_difference,std_error,t_statistic,p_value,parallel_trends_holds_5pct,parallel_trends_holds_10pct
+russia,west_cooperation_ratio-east_cooperation_ratio,-0.002761318932462108,0.0013573579997920781,-2.0343335604056487,0.050841368078715504,True,False
+ukraine,west_cooperation_ratio-east_cooperation_ratio,0.0016208916037095782,0.0018557543525710113,0.8734408201516284,0.38936101749804064,True,True

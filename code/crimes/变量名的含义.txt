@@ -1,0 +1,20 @@
+1、total publications
+effect系列：
+ukraine_gap：未经过指数变化的“真实值-拟合值”
+ukraine_actual_real：真实值经过指数变换
+ukraine_synthetic_real：拟合值经过指数变换
+ukraine_gap_pct_effect：经过指数变化的“真实值-拟合值”，是一个（year*1）的数列
+ukraine_gap_pct：变化量/初始发文量的百分比，是一个（year*1）的数列
+ukraine_avg_effect：对ukraine_gap_pct treated year之后的平均，是一个数值
+
+RSMSPE系列：
+pre_rmspe_ukraine：对ukraine_gap_pct_effect数值的平方、加和然后开方
+post_rmspe_ukraine：同
+rmspe_ratio_ukraine：post/pre的比例
+
+筛选指标：
+pre_rmspe_ukraine
+ukraine_avg_effect
+
+绘图指标：
+ukraine_gap_pct

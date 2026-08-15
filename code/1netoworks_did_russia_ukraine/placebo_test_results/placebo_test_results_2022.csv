@@ -1,0 +1,9 @@
+country,dependent_variable,placebo_year,did_estimate,std_error,p_value,significant_90,significant_95,significant_99
+russia,west_cooperation_ratio-east_cooperation_ratio,2018,-0.04152841546245332,0.022332525006930063,0.07070461749224163,True,False,False
+russia,west_cooperation_ratio-east_cooperation_ratio,2019,-0.041801697403207015,0.02233252500693005,0.06894854931151101,True,False,False
+russia,west_cooperation_ratio-east_cooperation_ratio,2020,-0.041809305962159704,0.02233252500693006,0.06890019567464382,True,False,False
+russia,west_cooperation_ratio-east_cooperation_ratio,2021,-0.0408914977699693,0.022332525006930063,0.07494586674489492,True,False,False
+ukraine,west_cooperation_ratio-east_cooperation_ratio,2018,-0.0014676485929066094,0.014547675034223209,0.9201718282601236,False,False,False
+ukraine,west_cooperation_ratio-east_cooperation_ratio,2019,-0.002024728024416717,0.014547675034223202,0.890043876572551,False,False,False
+ukraine,west_cooperation_ratio-east_cooperation_ratio,2020,-0.0018574200596582994,0.014547675034223202,0.8990769823462978,False,False,False
+ukraine,west_cooperation_ratio-east_cooperation_ratio,2021,-0.0016090367632348532,0.014547675034223202,0.9125121721551595,False,False,False

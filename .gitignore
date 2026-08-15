@@ -1,0 +1,135 @@
+# ============================================================
+# .gitignore — Science Nationalism Research Repository
+#
+# Three exclusion rationales:
+#   (A) LICENSED DATA — Clarivate/Web of Science records cannot be
+#       redistributed. See DATA.md for how to obtain them.
+#   (B) TOO LARGE FOR GIT — upstream public datasets (>100 MB per file
+#       exceeds GitHub's hard limit). See DATA.md for download links.
+#   (C) REGENERABLE — intermediates and figures produced by the pipeline.
+# ============================================================
+
+
+# ------------------------------------------------------------
+# (A) Licensed data — MUST NOT be redistributed
+# ------------------------------------------------------------
+
+# Article-level Web of Science / OST records (OST_BK, Annee_Bibliographique, Pays)
+*_articles.txt
+code/0raw_publiations_process/*_articles/
+code/0raw_publiations_process/countrol_countries_articles/
+
+# Symlinks into the out-of-repo raw data store (~/Dropbox/brexit_rawdata).
+# These resolve only on the original author's machine.
+code/0raw_publiations_process/brexit_experimental_data
+code/0raw_publiations_process/indicator_clean_data
+code/0raw_publiations_process/indicator_raw data
+code/0raw_publiations_process/publications_raw_data
+code/0raw_publiations_process/raw_data_2026
+
+# Association-rule mining output derived from article-level WoS records
+*_frequent_itemsets.csv
+*_association_rules.csv
+
+
+# ------------------------------------------------------------
+# (B) Upstream public datasets — too large for git
+#     MPIDR Scholarly Migration Database, redownloadable
+# ------------------------------------------------------------
+
+migration_data/**/data_input/
+*countryflows.parquet
+*countryflows.csv
+migration_data/**/FIGURES/
+
+
+# ------------------------------------------------------------
+# (C) Regenerable pipeline artefacts
+# ------------------------------------------------------------
+
+# Stata binary datasets (2200+ files: synth_*.dta, gap_*.dta, ...)
+*.dta
+*.gph
+*.stswp
+
+# Stata logs
+*.log
+*.smcl
+
+# Intermediate figures written by analysis scripts.
+# Final manuscript figures under paper/ are tracked (see negations below).
+code/**/*.png
+code/**/*.tif
+code/**/*.eps
+*.ai
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Snakemake
+.snakemake/
+
+
+# ------------------------------------------------------------
+# Editor / OS noise
+# ------------------------------------------------------------
+
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# Office lock files
+~$*
+.~lock.*
+
+# Local IDE / agent settings
+.vscode/
+.idea/
+.claude/
+
+
+# ------------------------------------------------------------
+# LaTeX build artefacts
+# ------------------------------------------------------------
+
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+
+
+# ------------------------------------------------------------
+# Manuscript
+# ------------------------------------------------------------
+
+# paper/ is its own git repository synced with Overleaf. Nesting it here would
+# record only an empty gitlink, so it is excluded. See README.md.
+paper/
+
+
+# ------------------------------------------------------------
+# Negations — explicitly track these despite rules above
+# ------------------------------------------------------------
+
+# Backup of country-name normalisation (documents a data transformation)
+!*.bak_country_names
+
+# Keep small country-level MPIDR parquet files: build_scm_panel.py reads them
+!migration_data/**/2026_V2/*scholarlymigration_country.parquet
