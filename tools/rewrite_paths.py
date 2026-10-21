@@ -49,20 +49,20 @@ ROOTS = [
     #
     # stata_results/ held one subdirectory per analysis, and those names
     # survive unchanged under code/ — except Brexit-stata_external, which
-    # was renamed Brexit-stata_external_try. Order matters: the rename must
+    # was renamed 01_scm_brexit. Order matters: the rename must
     # be matched before the generic prefix.
     "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results/"
-    "Brexit-stata_external:Brexit-stata_external_try",
+    "Brexit-stata_external:01_scm_brexit",
     "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data/stata_results:.",
     "/Users/sunmengge/Dropbox/Brexit/Data/experimental_data:.",
-    "/Users/sunmengge/Desktop/SCM_STATA/Brexit:Brexit-stata_external_try",
-    "/Users/sunmengge/Desktop/SCM_STATA/crimes:crimes",
-    "/Users/sunmengge/Dropbox/Brexit-stata:Brexit-stata_external_try",
+    "/Users/sunmengge/Desktop/SCM_STATA/Brexit:01_scm_brexit",
+    "/Users/sunmengge/Desktop/SCM_STATA/01_scm_crimea_2014:01_scm_crimea_2014",
+    "/Users/sunmengge/Dropbox/Brexit-stata:01_scm_brexit",
     "/Users/sunmengge/Dropbox/crimes_2022:crimes_2022",
-    "/Users/sunmengge/Dropbox/crimes:crimes",
-    "/Users/sunmengge/Dropbox/disciplines_crimes_2014:disciplines_crimes_2014",
-    "/Users/sunmengge/Dropbox/disciplines_crimes:disciplines_crimes",
-    "/Users/sunmengge/Dropbox/disciplines_brexit:disciplines_brexit",
+    "/Users/sunmengge/Dropbox/01_scm_crimea_2014:01_scm_crimea_2014",
+    "/Users/sunmengge/Dropbox/05_scm_disciplines_crimea_2014:05_scm_disciplines_crimea_2014",
+    "/Users/sunmengge/Dropbox/05_scm_disciplines_war_2022:05_scm_disciplines_war_2022",
+    "/Users/sunmengge/Dropbox/05_scm_disciplines_brexit:05_scm_disciplines_brexit",
 ]
 
 

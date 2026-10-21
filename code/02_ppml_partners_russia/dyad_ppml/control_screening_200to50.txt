@@ -1,0 +1,113 @@
+================================================================================
+俄罗斯 dyadic PPML —— 控制组筛选清单（200 国 → 50 国 → 6 国）
+=========================================================================
+
+汇总
+--------------------------------------------------------------------------------
+  类别                              国家数
+  1  直接受冲击 / 参战方                4
+  2  替代 / 外流目的地                 12
+  3  自身同期双边冲击                   1
+  4  伙伴集团成员（是被度量对象）        34
+  5  其他制裁国（本身被处理）           13
+  6  体量不足（某集团合作量过低）        86
+  ------------------------------------------
+  合格保留                            50
+  合计                               200
+
+最终主控制组（50 国中按最接近俄罗斯战前轨迹取前 6）：
+  Mexico, Chile, Brazil, South Africa, Thailand, Argentina
+
+
+
+--------------------------------------------------------------------------------
+第 1 类  直接受冲击 / 参战方（4 国）
+  理由：被战争或相关安全冲击直接击中，本身即被处理单元，不能当对照。
+--------------------------------------------------------------------------------
+  Ukraine（乌克兰，战场）
+  Belarus（白俄罗斯，协从参战方；数据标签 BYELARUS）
+  Moldova（摩尔多瓦，边境安全冲击）
+  Georgia（格鲁吉亚，政治/安全冲击）
+
+--------------------------------------------------------------------------------
+第 2 类  替代 / 外流目的地（12 国）
+  理由：俄罗斯学者外流、合作关系转移的落脚地。用作对照会把"从俄罗斯
+        转移出去的合作"误算进对照组，使效应被人为推向更负。
+--------------------------------------------------------------------------------
+  中亚    : Kazakhstan, Uzbekistan, Kyrgyzstan, Tajikistan, Turkmenistan
+  南高加索: Armenia, Azerbaijan
+  巴尔干  : Serbia（REPUBLIC OF SERBIA）, Montenegro
+  其他    : Turkey（TURKIYE）, Israel, United Arab Emirates
+
+--------------------------------------------------------------------------------
+第 3 类  自身有同期双边冲击（1 国）
+  理由：本身在同期经历自己的制裁/脱钩，混入与俄乌战争无关的冲击。
+--------------------------------------------------------------------------------
+  Iran（伊朗；数据标签 IRAN, ISLAMIC REP.）
+  注：China / Hong Kong 在方法上同属此类（中美脱钩、China Initiative），
+      但被更早触发的第 4 类（伙伴集团成员）规则归走。
+
+--------------------------------------------------------------------------------
+第 4 类  伙伴集团成员（34 国）—— 最关键的一类
+  理由：这些国家本身就是 beta_g 要度量的对象（EU / 北美 / 发达亚洲 /
+        中国 四个伙伴集团），是"结果"而非"对照"。拿德国当对照衡量俄德
+        合作变化，等于自己量自己。
+--------------------------------------------------------------------------------
+  EU-27 + UK (28): Austria, Belgium, Bulgaria, Croatia, Cyprus, Czechia,
+                   Denmark, Estonia, Finland, France, Germany, Greece,
+                   Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg,
+                   Malta, Netherlands, Poland, Portugal, Romania,
+                   Slovak Republic, Slovenia, Spain, Sweden, United Kingdom
+  北美 (2)       : United States, Canada
+  发达亚洲 (3)   : Japan, South Korea, Singapore
+  中国 (1)       : China
+
+--------------------------------------------------------------------------------
+第 5 类  其他制裁国（本身被处理）（13 国）
+  理由：未进伙伴集团、但同样对俄制裁或切断科研联系的（多为西方）国家，
+        与俄合作本身在下降，属被处理单元，不能充当"若无战争"的参照。
+--------------------------------------------------------------------------------
+  Australia, New Zealand, Switzerland, Norway, Iceland, Liechtenstein,
+  Monaco, San Marino, Andorra, Taiwan, Albania, Macedonia,
+  Bosnia & Herzegovina
+
+--------------------------------------------------------------------------------
+第 6 类  体量不足（86 国）
+  理由：与某个伙伴集团的战前年均合作量低于门槛，撑不起分集团估计与
+        in-space placebo。数量最多，以全球南方中小国家为主。
+  集团门槛（年均篇数）: EU 200 / 北美 50 / 发达亚洲 20 / 中国 20 / 其余 100
+  卡住国家数（一国可能同时卡多个集团）:
+        中国 80  |  发达亚洲 75  |  EU 69  |  北美 58  |  其余 37
+--------------------------------------------------------------------------------
+  Afghanistan, Angola, Antigua & Barbuda, Bahamas, Barbados, Belize,
+  Benin, Bermuda, Bhutan, Bolivia, Botswana, Brunei, Burkina Faso, Burma,
+  Burundi, Cape Verde, Central African Republic, Chad, Comoros,
+  Cook Islands, Djibouti, Dominica, Dominican Republic, El Salvador,
+  Equatorial Guinea, Eritrea, Federated States of Micronesia, Fiji,
+  French-Polynesia, Gabon, Gambia, Grenada, Guatemala, Guinea,
+  Guinea-Bissau, Guyana, Haiti, Honduras, Ivory Coast, Jamaica, Kiribati,
+  Laos, Lesotho, Liberia, Libya, Madagascar, Maldives, Mali,
+  Marshall Islands, Mauritania, Mauritius, Mozambique, Namibia, Nauru,
+  Netherlands-Antilles, New-Caledonia, Nicaragua, Niger, Niue,
+  North Korea, Palau, Papua New Guinea, Paraguay, Republic of Kosovo,
+  Saint-Vincent-et-les-Grenadines, Samoa, Sao Tome & Principe, Senegal,
+  Seychelles, Sierra Leone, Solomon Islands, Somalia, South Sudan,
+  St-Kitts & Nevis, St-Lucia, Suriname, Swaziland, Syria, Togo, Tonga,
+  Trinidad and Tobago, Tuvalu, Vanuatu, Vatican, Yemen, Zimbabwe
+
+
+================================================================================
+合格池（50 国）
+================================================================================
+  Algeria, Argentina, Bahrain, Bangladesh, Brazil, Cambodia, Cameroon,
+  Chile, Colombia, Congo, Costa Rica, Cuba, Ecuador, Egypt, Ethiopia,
+  Ghana, India, Indonesia, Iraq, Jordan, Kenya, Kuwait, Lebanon, Malawi,
+  Malaysia, Mexico, Mongolia, Morocco, Nepal, Nigeria, Oman, Pakistan,
+  Palestine, Panama, Peru, Philippines, Qatar, Rwanda, Saudi Arabia,
+  South Africa, Sri Lanka, Sudan, Tanzania, Thailand, Tunisia, Uganda,
+  Uruguay, Venezuela, Viet Nam, Zambia
+
+  → 再按"最接近俄罗斯战前分集团轨迹"（最差集团偏差 max_absdiff 升序）
+    排序，取前 6 作为主控制组：
+        Mexico, Chile, Brazil, South Africa, Thailand, Argentina
+================================================================================

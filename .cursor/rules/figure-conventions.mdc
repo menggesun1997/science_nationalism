@@ -1,0 +1,42 @@
+---
+description: Figure conventions for all plotting scripts in this project
+globs: code/**/*.py,code/**/*.do
+alwaysApply: false
+---
+
+# Figure conventions
+
+Apply these to every figure produced by plotting scripts (matplotlib Python
+and Stata graphs), unless the user explicitly overrides for a specific plot.
+
+## 1. X-axis year ticks must be integers (no decimal point)
+
+Years like `2005.0`, `2007.5` are not allowed. Ticks must read `2005`, `2010`, ...
+
+matplotlib:
+
+```python
+from matplotlib.ticker import FuncFormatter, MaxNLocator
+
+def integer_xaxis(ax):
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{int(round(v))}"))
+```
+
+Stata: use `xlabel(2005(5)2024)` with integer steps, never fractional.
+
+## 2. Legend goes at the bottom, on a single row
+
+Do not place per-axis legends inside panels. Use one figure-level legend
+centered below the plot, `ncol` equal to the number of entries so it stays on
+one line.
+
+```python
+handles, labels = ax.get_legend_handles_labels()
+fig.legend(handles, labels, frameon=False, loc="lower center",
+           ncol=len(labels), bbox_to_anchor=(0.5, -0.02))
+fig.tight_layout(rect=(0, 0.05, 1, 1))
+```
+
+For multi-panel grids, collect handles from one representative axis and draw a
+single `fig.legend(...)` at the bottom.

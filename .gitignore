@@ -16,16 +16,16 @@
 
 # Article-level Web of Science / OST records (OST_BK, Annee_Bibliographique, Pays)
 *_articles.txt
-code/0raw_publiations_process/*_articles/
-code/0raw_publiations_process/countrol_countries_articles/
+code/00_data_processing/*_articles/
+code/00_data_processing/countrol_countries_articles/
 
 # Symlinks into the out-of-repo raw data store (~/Dropbox/brexit_rawdata).
 # These resolve only on the original author's machine.
-code/0raw_publiations_process/brexit_experimental_data
-code/0raw_publiations_process/indicator_clean_data
-code/0raw_publiations_process/indicator_raw data
-code/0raw_publiations_process/publications_raw_data
-code/0raw_publiations_process/raw_data_2026
+code/00_data_processing/brexit_experimental_data
+code/00_data_processing/indicator_clean_data
+code/00_data_processing/indicator_raw data
+code/00_data_processing/publications_raw_data
+code/00_data_processing/raw_data_2026
 
 # Association-rule mining output derived from article-level WoS records
 *_frequent_itemsets.csv
@@ -41,6 +41,10 @@ migration_data/**/data_input/
 *countryflows.parquet
 *countryflows.csv
 migration_data/**/FIGURES/
+
+# Nested standalone repository, maintained separately on GitHub
+# (menggesun1997/openalex-scholar-migration-data). Not part of this repo.
+migration_data/openalex_pipeline/
 
 
 # ------------------------------------------------------------
@@ -122,13 +126,13 @@ desktop.ini
 # published repository unambiguous about which code produced the results.
 # ------------------------------------------------------------
 
-# Replaced by crimes_2015_2022/, which restricts the pre-treatment fit
-# window to 2015+. Referenced only from commented-out code.
-code/crimes_2022/
+# Analyses not used in the current manuscript (migration, old SCM copy,
+# network experiments). Kept on disk; excluded from the public release.
+_archive/
 
 # Abandoned variants reading original_completed_new.xlsx
-code/crimes_2015_2022/intl_ratio_new/
-code/crimes_2015_2022/total_publications_new/
+code/01_scm_war_2022/intl_ratio_new/
+code/01_scm_war_2022/total_publications_new/
 
 
 # ------------------------------------------------------------

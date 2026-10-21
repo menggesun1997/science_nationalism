@@ -92,20 +92,18 @@ class Result:
 
 
 STAGES = [
-    ("Stage 1  raw processing", ["0raw_publiations_process"]),
-    ("Stage 2  network DiD/sDiD", ["1netoworks_did_russia_ukraine",
-                                   "1networks_sdid_brexit"]),
-    ("Stage 3  PPML internal control", ["2ppml_did_"]),
-    ("Stage 4  two-way DiD", ["2two_way_did_"]),
-    ("Stage 5  migration ITS", ["3ppml_migration_did_"]),
-    ("Stage 6  SCM migration", ["4scm_"]),
-    ("Stage 7  Figure 1", ["00_master.do", "99_combine_figure1.do",
-                           "Brexit-stata_external_try", "crimes/",
-                           "crimes_2015_2022"]),
-    ("Stage 8  disciplines", ["disciplines_"]),
-    ("Stage 9  experiments", ["add_experiments"]),
+    ("00  data processing", ["00_data_processing"]),
+    ("01  SCM aggregate", ["01_scm_brexit", "01_scm_crimea_2014",
+                           "01_scm_war_2022", "00_master.do",
+                           "99_combine_figure1.do"]),
+    ("02  PPML partners", ["02_ppml_partners_"]),
+    ("03  two-way DiD", ["03_twoway_did_"]),
+    ("04  West-East tilt", ["04_west_east_tilt"]),
+    ("05  SCM disciplines", ["05_scm_disciplines_"]),
+    ("06  bridging", ["06_bridging"]),
     ("Utilities", ["extract_avg_effects", "visualize_effects",
-                   "normalize_country_names", "visualization/"]),
+                   "normalize_country_names", "visualization/",
+                   "99_utilities"]),
 ]
 
 
@@ -194,7 +192,7 @@ ANCHORS = {
     "CODE": CODE,
     "REPO": REPO,
     "RAW_DATA_STORE": Path(
-        os.environ.get("SCIENCE_NATIONALISM_RAW", CODE / "0raw_publiations_process")
+        os.environ.get("SCIENCE_NATIONALISM_RAW", CODE / "00_data_processing")
     ),
     "MIGRATION_2026": REPO / "migration_data"
     / "Global-flows-and-rates-of-international-migration-of-scholars-2026_V2"
@@ -202,7 +200,7 @@ ANCHORS = {
     "LEGACY_BREXIT": Path(
         os.environ.get(
             "SCIENCE_NATIONALISM_LEGACY_BREXIT",
-            CODE / "0raw_publiations_process" / "legacy_brexit_cooperation",
+            CODE / "00_data_processing" / "legacy_brexit_cooperation",
         )
     ),
 }

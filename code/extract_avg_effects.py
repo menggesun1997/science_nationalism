@@ -23,9 +23,9 @@ base_dir = Path(str(CODE))
 
 # 三个事件文件夹
 event_folders = {
-    'disciplines_brexit': 'Brexit',
-    'disciplines_crimes': 'Crimes',
-    'disciplines_crimes_2014': 'Crimes_2014'
+    '05_scm_disciplines_brexit': 'Brexit',
+    '05_scm_disciplines_war_2022': 'War_2022',
+    '05_scm_disciplines_crimea_2014': 'Crimea_2014'
 }
 
 # 变量类型文件夹（注意拼写不同）
@@ -76,8 +76,8 @@ def process_event_folder(event_folder_name, event_display_name):
         print(f"Warning: {event_path} does not exist")
         return
     
-    # disciplines_brexit 的结构不同
-    if event_folder_name == 'disciplines_brexit':
+    # 05_scm_disciplines_brexit 的结构不同
+    if event_folder_name == '05_scm_disciplines_brexit':
         disciplines_path = event_path
     else:
         disciplines_path = event_path / 'disciplines'

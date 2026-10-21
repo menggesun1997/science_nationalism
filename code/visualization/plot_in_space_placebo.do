@@ -50,19 +50,35 @@ if _rc {
     do "`_cfg'"
 }
 
+cd "$CODE/visualization"
+
 global root "$ROOT"
-global fig_dir "$root/paper/figure_SI"
+* Output directory. Defaults to the paper's SI figure folder, but a caller can
+* point $fig_dir somewhere else first (e.g. a staging folder) to review the
+* figures before overwriting the published ones.
+if "$fig_dir" == "" {
+    global fig_dir "$root/paper/figure_SI"
+}
 global rmspe_multiplier 5
 
 capture program drop calc_placebo_p
 program define calc_placebo_p, rclass
-    syntax varname, Donors(varlist) Treatyear(integer) [Multiplier(real 5)]
+    syntax varname, Donors(varlist) Treatyear(integer) [Multiplier(real 5) Postend(integer 0)]
+
+    * postend=0 表示后处理期不设上限（默认，Brexit/War 用）。克里米亚传 2021，
+    * 使 p 值与效应量都排除 2022 全面战争的冲击。
+    if `postend' == 0 {
+        local postcond "Year >= `treatyear'"
+    }
+    else {
+        local postcond "Year >= `treatyear' & Year <= `postend'"
+    }
 
     tempvar sq
     quietly gen double `sq' = `varlist'^2
     quietly summarize `sq' if Year < `treatyear'
     local pre = sqrt(r(mean))
-    quietly summarize `sq' if Year >= `treatyear'
+    quietly summarize `sq' if `postcond'
     local post = sqrt(r(mean))
     drop `sq'
 
@@ -85,7 +101,7 @@ program define calc_placebo_p, rclass
         quietly gen double `dsq' = `donor'^2
         quietly summarize `dsq' if Year < `treatyear'
         local dpre = sqrt(r(mean))
-        quietly summarize `dsq' if Year >= `treatyear'
+        quietly summarize `dsq' if `postcond'
         local dpost = sqrt(r(mean))
         drop `dsq'
 
@@ -116,12 +132,12 @@ program define draw_placebo_graph
     syntax, Donors(varlist) Tr1(name) Lab1(string) Color1(string) ///
         Treatyear(integer) OUTfile(string) TITLE(string) YTITLE(string) ///
         Xmin(integer) Xmax(integer) ///
-        [Tr2(name) Lab2(string) Color2(string) Multiplier(real 5)]
+        [Tr2(name) Lab2(string) Color2(string) Multiplier(real 5) Postend(integer 0)]
 
     local treated_vars "`tr1'"
     if "`tr2'" != "" local treated_vars "`treated_vars' `tr2'"
 
-    calc_placebo_p `tr1', donors(`donors') treatyear(`treatyear') multiplier(`multiplier')
+    calc_placebo_p `tr1', donors(`donors') treatyear(`treatyear') multiplier(`multiplier') postend(`postend')
     local p1 : display %4.3f r(p)
     local n1 = r(n_placebos)
     local qn1 = r(n_qualified)
@@ -130,7 +146,7 @@ program define draw_placebo_graph
     local ptext1 "p-value (`lab1') = `p1' (N=`n1')"
 
     if "`tr2'" != "" {
-        calc_placebo_p `tr2', donors(`donors') treatyear(`treatyear') multiplier(`multiplier')
+        calc_placebo_p `tr2', donors(`donors') treatyear(`treatyear') multiplier(`multiplier') postend(`postend')
         local p2 : display %4.3f r(p)
         local n2 = r(n_placebos)
         local qn2 = r(n_qualified)
@@ -328,10 +344,12 @@ capture program drop plot_total_case
 program define plot_total_case
     syntax, DATA(string) Treatyear(integer) Xmin(integer) OUTfile(string) ///
         TITLE(string) Tr1(name) Lab1(string) Color1(string) ///
-        [Tr2(name) Lab2(string) Color2(string)]
+        [Tr2(name) Lab2(string) Color2(string) Postend(integer 0) XMAXcap(integer 0)]
 
     use "`data'", clear
     keep if Year >= `xmin'
+    * xmaxcap 截断可视化窗口（克里米亚传 2021，与 p 值窗口保持一致）。
+    if `xmaxcap' > 0 keep if Year <= `xmaxcap'
     quietly summarize Year
     local xmax = r(max)
 
@@ -352,14 +370,14 @@ program define plot_total_case
         draw_placebo_graph, donors(`donors') tr1(`tr1') lab1("`lab1'") ///
             color1("`color1'") treatyear(`treatyear') outfile("`outfile'") ///
             title("`title'") ytitle("Treatment effect (%)") ///
-            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier) ///
+            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier) postend(`postend') ///
             tr2(`tr2') lab2("`lab2'") color2("`color2'")
     }
     else {
         draw_placebo_graph, donors(`donors') tr1(`tr1') lab1("`lab1'") ///
             color1("`color1'") treatyear(`treatyear') outfile("`outfile'") ///
             title("`title'") ytitle("Treatment effect (%)") ///
-            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier)
+            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier) postend(`postend')
     }
 end
 
@@ -367,7 +385,7 @@ capture program drop plot_ratio_case
 program define plot_ratio_case
     syntax, BASEdir(string) Treatyear(integer) Xmin(integer) OUTfile(string) ///
         TITLE(string) File1(string) Gap1(string) Lab1(string) Color1(string) ///
-        [File2(string) Gap2(string) Lab2(string) Color2(string) EXclude(string)]
+        [File2(string) Gap2(string) Lab2(string) Color2(string) EXclude(string) Postend(integer 0) XMAXcap(integer 0)]
 
     tempfile master donor_tmp
     use "`basedir'/`file1'", clear
@@ -375,6 +393,7 @@ program define plot_ratio_case
     rename `gap1' treated1
     replace treated1 = treated1 * 100
     keep if Year >= `xmin'
+    if `xmaxcap' > 0 keep if Year <= `xmaxcap'
     quietly summarize Year
     local xmax = r(max)
     save `master', replace
@@ -385,6 +404,7 @@ program define plot_ratio_case
         rename `gap2' treated2
         replace treated2 = treated2 * 100
         keep if Year >= `xmin'
+        if `xmaxcap' > 0 keep if Year <= `xmaxcap'
         merge 1:1 Year using `master', nogenerate
         save `master', replace
     }
@@ -416,6 +436,7 @@ program define plot_ratio_case
             label variable donor`i' "`donor_label'"
             replace donor`i' = donor`i' * 100
             keep if Year >= `xmin'
+            if `xmaxcap' > 0 keep if Year <= `xmaxcap'
             save `donor_tmp', replace
 
             use `master', clear
@@ -431,27 +452,27 @@ program define plot_ratio_case
         draw_placebo_graph, donors(`donors') tr1(treated1) lab1("`lab1'") ///
             color1("`color1'") treatyear(`treatyear') outfile("`outfile'") ///
             title("`title'") ytitle("Treatment effect (percentage points)") ///
-            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier) ///
+            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier) postend(`postend') ///
             tr2(treated2) lab2("`lab2'") color2("`color2'")
     }
     else {
         draw_placebo_graph, donors(`donors') tr1(treated1) lab1("`lab1'") ///
             color1("`color1'") treatyear(`treatyear') outfile("`outfile'") ///
             title("`title'") ytitle("Treatment effect (percentage points)") ///
-            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier)
+            xmin(`xmin') xmax(`xmax') multiplier($rmspe_multiplier) postend(`postend')
     }
 end
 
 * Brexit: only the United Kingdom is treated.
 plot_total_case, ///
-    data("$root/code/Brexit-stata_external_try/total_publications/all_gaps_merged.dta") ///
+    data("$root/code/01_scm_brexit/total_publications/all_gaps_merged.dta") ///
     treatyear(2016) xmin(2005) ///
     outfile("$fig_dir/brexit_in_space_placebo_total.pdf") ///
     title("Brexit in-space placebo: total publications") ///
     tr1(uk_gap_pct) lab1("United Kingdom") color1("201 6 43")
 
 plot_ratio_case, ///
-    basedir("$root/code/Brexit-stata_external_try/intl_ratio") ///
+    basedir("$root/code/01_scm_brexit/intl_ratio") ///
     treatyear(2016) xmin(2005) ///
     outfile("$fig_dir/brexit_in_space_placebo_ratio.pdf") ///
     title("Brexit in-space placebo: international collaboration ratio") ///
@@ -460,17 +481,18 @@ plot_ratio_case, ///
     exclude("UNITED_KINGDOM EU")
 
 * 2014 Crimean crisis: Russia and Ukraine are treated units.
+* postend(2021): 克里米亚效应与 p 值只统计到 2021，排除 2022 全面战争的冲击。
 plot_total_case, ///
-    data("$root/code/crimes/total_publications/all_gaps_merged.dta") ///
-    treatyear(2014) xmin(2005) ///
+    data("$root/code/01_scm_crimea_2014/total_publications/all_gaps_merged.dta") ///
+    treatyear(2014) xmin(2005) postend(2021) xmaxcap(2021) ///
     outfile("$fig_dir/crimean_in_space_placebo_total.pdf") ///
     title("Crimean crisis in-space placebo: total publications") ///
     tr1(russia_gap_pct) lab1("Russia") color1("76 92 156") ///
     tr2(ukraine_gap_pct) lab2("Ukraine") color2("227 195 65")
 
 plot_ratio_case, ///
-    basedir("$root/code/crimes/intl_ratio") ///
-    treatyear(2014) xmin(2005) ///
+    basedir("$root/code/01_scm_crimea_2014/intl_ratio") ///
+    treatyear(2014) xmin(2005) postend(2021) xmaxcap(2021) ///
     outfile("$fig_dir/crimean_in_space_placebo_ratio.pdf") ///
     title("Crimean crisis in-space placebo: international collaboration ratio") ///
     file1("russia_synth_results.dta") gap1("russia_gap") ///
@@ -481,7 +503,7 @@ plot_ratio_case, ///
 
 * 2022 full-scale invasion: Russia and Ukraine are treated units.
 plot_total_case, ///
-    data("$root/code/crimes_2015_2022/total_publications/all_gaps_merged.dta") ///
+    data("$root/code/01_scm_war_2022/total_publications/all_gaps_merged.dta") ///
     treatyear(2022) xmin(2015) ///
     outfile("$fig_dir/war_in_space_placebo_total.pdf") ///
     title("Full-scale invasion in-space placebo: total publications") ///
@@ -489,7 +511,7 @@ plot_total_case, ///
     tr2(ukraine_gap_pct) lab2("Ukraine") color2("227 195 65")
 
 plot_ratio_case, ///
-    basedir("$root/code/crimes_2015_2022/intl_ratio") ///
+    basedir("$root/code/01_scm_war_2022/intl_ratio") ///
     treatyear(2022) xmin(2015) ///
     outfile("$fig_dir/war_in_space_placebo_ratio.pdf") ///
     title("Full-scale invasion in-space placebo: international collaboration ratio") ///

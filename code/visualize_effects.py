@@ -63,15 +63,12 @@ def plot_brexit():
             aggfunc='first'
         )
         
-        # 确保EU和UK列存在
-        if 'EU' not in pivot_df.columns:
-            pivot_df['EU'] = np.nan
+        # EU is no longer treated as a unit: plot the UK only.
         if 'UK' not in pivot_df.columns:
             pivot_df['UK'] = np.nan
         
-        # 按照UK的效应值从大到小排序（如果UK有缺失值，则用EU的值）
-        # 优先使用UK的值，如果UK为NaN则使用EU的值
-        pivot_df['sort_value'] = pivot_df['UK'].fillna(pivot_df['EU'])
+        # 按照UK的效应值从大到小排序
+        pivot_df['sort_value'] = pivot_df['UK']
         
         # 按效应值从大到小排序，并重置索引
         pivot_df = pivot_df.sort_values('sort_value', ascending=False).reset_index()
@@ -86,14 +83,11 @@ def plot_brexit():
         fig, ax = plt.subplots(figsize=(16, 9))
         
         x = np.arange(len(disciplines))
-        width = 0.35
+        width = 0.55
         
-        # 绘制柱状图 - 使用指定的RGB颜色
-        # EU: RGB(0, 51, 154), UK: RGB(201, 6, 43)
-        eu_color = (0/255, 51/255, 154/255)
+        # 绘制柱状图 - UK: RGB(201, 6, 43)
         uk_color = (201/255, 6/255, 43/255)
-        bars1 = ax.bar(x - width/2, pivot_df['EU'], width, label='EU', color=eu_color, alpha=0.85, edgecolor='black', linewidth=0.5)
-        bars2 = ax.bar(x + width/2, pivot_df['UK'], width, label='UK', color=uk_color, alpha=0.85, edgecolor='black', linewidth=0.5)
+        bars2 = ax.bar(x, pivot_df['UK'], width, label='UK', color=uk_color, alpha=0.85, edgecolor='black', linewidth=0.5)
         
         # 添加零线
         ax.axhline(y=0, color='black', linestyle='-', linewidth=1)

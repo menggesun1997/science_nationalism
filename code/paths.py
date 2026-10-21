@@ -5,7 +5,7 @@ the code runs unchanged from any checkout directory on any operating system.
 
 Usage from a script anywhere under ``code/``::
 
-    from paths import CODE, RAW_PUBLICATIONS, MIGRATION_2026
+    from paths import CODE, RAW_PUBLICATIONS
 
     df = pd.read_csv(RAW_PUBLICATIONS / "countries_yearly_statistics.csv")
 
@@ -41,7 +41,7 @@ MIGRATION_DATA = REPO / "migration_data"
 
 # --- Publication data (licensed; see DATA.md) --------------------------------
 
-RAW_PUBLICATIONS = CODE / "0raw_publiations_process"
+RAW_PUBLICATIONS = CODE / "00_data_processing"
 RAW_PROCESSING = RAW_PUBLICATIONS / "raw data processing"
 
 # Overridable location of the licensed Clarivate/OST article-level files. The
@@ -57,59 +57,54 @@ INDICATOR_RAW = RAW_DATA_STORE / "indicator_raw data"
 INDICATOR_CLEAN = RAW_DATA_STORE / "indicator_clean_data"
 RAW_DATA_2026 = RAW_DATA_STORE / "raw_data_2026"
 
-# Stage 1b (1networks_sdid_brexit) originally read from a separate Brexit
-# project tree that predates this repository. Those inputs are not part of the
-# release; the scripts are kept for provenance. Override the location with:
-#     export SCIENCE_NATIONALISM_LEGACY_BREXIT=/path/to/cooperation_related
+# Optional / unused by the current paper; kept so leftover scripts still import.
 LEGACY_BREXIT = Path(
     os.environ.get(
         "SCIENCE_NATIONALISM_LEGACY_BREXIT",
         RAW_DATA_STORE / "legacy_brexit_cooperation",
     )
 ).expanduser()
-
-# --- MPIDR Scholarly Migration Database (public; see DATA.md) ----------------
-
 MIGRATION_2026 = (
     MIGRATION_DATA
     / "Global-flows-and-rates-of-international-migration-of-scholars-2026_V2"
     / "2026_V2"
 )
-MIGRATION_WOS = MIGRATION_DATA / "wos_data"
 
-# --- Analysis stages ---------------------------------------------------------
+# --- Analysis modules (see code/README.md) -----------------------------------
 
 EVENTS = ("eu", "russia", "uk", "ukraine")
 
-NETWORKS_RUSSIA_UKRAINE = CODE / "1netoworks_did_russia_ukraine"
-NETWORKS_BREXIT = CODE / "1networks_sdid_brexit"
-FIGURES_OUT = CODE / "picutres"
+WEST_EAST_TILT = CODE / "04_west_east_tilt"
+NETWORKS_RUSSIA_UKRAINE = WEST_EAST_TILT  # backward-compatible alias
+FIGURES_OUT = CODE / "figures"
+SCM_BREXIT = CODE / "01_scm_brexit"
+SCM_CRIMEA = CODE / "01_scm_crimea_2014"
+SCM_WAR = CODE / "01_scm_war_2022"
+BRIDGING = CODE / "06_bridging"
 
 
 def ppml_internal(event: str) -> Path:
-    """Stage 2 directory for the internal-control PPML DiD of ``event``."""
+    """Partner-level PPML DiD with internal controls (main-text maps)."""
     _check_event(event)
-    return CODE / f"2ppml_did_{event}_internal_control"
+    return CODE / f"02_ppml_partners_{event}"
 
 
 def two_way(event: str) -> Path:
-    """Stage 3 directory for the external-control two-way DiD of ``event``."""
+    """External-control two-way DiD (SI G)."""
     _check_event(event)
-    return CODE / f"2two_way_did_{event}"
+    return CODE / f"03_twoway_did_{event}"
 
 
-def migration_ppml(event: str, mpidr: bool = False) -> Path:
-    """Stage 4 migration-flow directory. ``mpidr=True`` selects the MPIDR
-    replication that uses the Scholarly Migration Database instead of WoS."""
-    suffix = "_mpidr" if mpidr else ""
-    return CODE / f"3ppml_migration_did_{event}_internal_control{suffix}"
-
-
-def scm(event: str, source: str = "openalex") -> Path:
-    """Stage 5 synthetic-control directory. ``source`` is ``openalex`` or ``wos``."""
-    if source not in ("openalex", "wos"):
-        raise ValueError(f"source must be 'openalex' or 'wos', got {source!r}")
-    return CODE / f"4scm_{event}_{source}"
+def scm_disciplines(event: str) -> Path:
+    """Discipline-level SCM. ``event`` is brexit, crimea_2014, or war_2022."""
+    names = {
+        "brexit": "05_scm_disciplines_brexit",
+        "crimea_2014": "05_scm_disciplines_crimea_2014",
+        "war_2022": "05_scm_disciplines_war_2022",
+    }
+    if event not in names:
+        raise ValueError(f"event must be one of {tuple(names)}, got {event!r}")
+    return CODE / names[event]
 
 
 def _check_event(event: str) -> None:
@@ -144,4 +139,4 @@ if __name__ == "__main__":
     print(f"CODE             {CODE}")
     print(f"PAPER            {PAPER}   exists={PAPER.exists()}")
     print(f"RAW_DATA_STORE   {RAW_DATA_STORE}")
-    print(f"MIGRATION_2026   {MIGRATION_2026}   exists={MIGRATION_2026.exists()}")
+    print(f"FIGURES_OUT      {FIGURES_OUT}")

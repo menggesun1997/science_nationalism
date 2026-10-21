@@ -8,8 +8,8 @@
 *   $CODE     $ROOT/code
 *   $PAPER    $ROOT/paper
 *   $MIGDATA  $ROOT/migration_data
-*   $FIGDIR   $CODE/picutres        (Figure 1 panels and .gph sources)
-*   $RAWPUB   $CODE/0raw_publiations_process
+*   $FIGDIR   $CODE/figures        (Figure 1 panels and .gph sources)
+*   $RAWPUB   $CODE/00_data_processing
 *
 * Include it at the top of any do-file. Stata has no equivalent of Python's
 * __file__, so pass the including file's directory when you know it:
@@ -87,17 +87,27 @@ if "$ROOT" == "" {
 global CODE    "$ROOT/code"
 global PAPER   "$ROOT/paper"
 global MIGDATA "$ROOT/migration_data"
-global FIGDIR  "$CODE/picutres"
-global RAWPUB  "$CODE/0raw_publiations_process"
+global FIGDIR  "$CODE/figures"
+global RAWPUB  "$CODE/00_data_processing"
 
-* ── Shared colour palette (Okabe-Ito, colour-blind safe) ───────────────
-* Used by Figure 1 panels and every event-study plot.
-global C_EU    "0 114 178"      // #0072B2  blue    — EU
-global C_UK    "213 94 0"       // #D55E00  vermillion — UK
-global C_RU    "86 180 233"     // #56B4E9  sky blue — Russia
-global C_UA    "230 159 0"      // #E69F00  orange  — Ukraine
+* ── Shared colour palette ──────────────────────────────────────────────
+* These are the colours of the published figures (paper/figure/a-f.pdf,
+* ru-crimean.pdf, ru-war.pdf), sampled from the final PDFs so that a rerun
+* reproduces them instead of drifting to a different scheme. Keep them in
+* sync with 99_redraw_panels.do, which plots the Figure 1 panels.
+global C_EU    "33 65 148"      // #214194  deep blue  — EU
+global C_UK    "190 39 56"      // #BE2738  red        — UK
+global C_RU    "75 92 156"      // #4B5C9C  blue-violet — Russia
+global C_UA    "226 195 65"     // #E2C341  golden     — Ukraine
+global C_GOLD  "215 183 84"     // #D7B754  gold accent (Figure 1)
+global C_SLATE "81 98 153"      // #516299  slate blue accent (Figure 1)
 global C_SHADE "238 238 238"    // #EEEEEE  post-treatment shading
 global C_LINE  "68 68 68"       // #444444  intervention line
+global C_GREY  "85 85 85"       // #555555  secondary text/lines
+
+* In-space placebo plots: treated unit red, donor placebos light pink.
+global C_TREATED "201 6 43"     // #C9062B  treated-unit gap
+global C_PLACEBO "233 155 170"  // #E99BAA  donor placebo gaps
 
 * ── Required community-contributed commands ────────────────────────────
 * ppmlhdfe/reghdfe/ftools install from SSC; synth2 and sdid are hosted

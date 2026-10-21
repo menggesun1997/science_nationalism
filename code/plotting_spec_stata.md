@@ -15,7 +15,7 @@ analysis/*.do  →  results/*.dta  →  plot/*.do  →  output/gph/*.gph  →  9
 ## 一、文件结构
 
 ```
-/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/
+
 ├── 00_master.do
 ├── 99_combine_figure1.do
 ├── analysis/
@@ -40,7 +40,7 @@ analysis/*.do  →  results/*.dta  →  plot/*.do  →  output/gph/*.gph  →  9
 │   ├── war_total.dta
 │   └── war_ratio.dta
 ├── output/gph/                   # panel_a.gph … panel_l.gph + legend_only.gph
-└── picutres/                     # figure1.pdf, figure1.png
+└── figures/                     # figure1.pdf, figure1.png
 ```
 
 ---
@@ -307,8 +307,8 @@ global C_EU "31 78 121"  ;  global C_UK "181 72 42"
 global C_RU "91 117 83"  ;  global C_UA "210 162 76"
 global C_SHADE "238 238 238"  ;  global C_LINE "68 68 68"  ;  global C_GREY "85 85 85"
 
-global root "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code"
-cd "$root"
+do "../config.do"
+cd "$CODE"
 
 * 分析层（结果已有时保持注释）
 * do "analysis/01_brexit_total.do"
@@ -348,7 +348,7 @@ do "99_combine_figure1.do"
 clear all
 set scheme white_tableau
 graph set window fontface "Helvetica"
-global root "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code"
+do "../config.do"
 
 grc1leg ///
     "output/gph/panel_a.gph" "output/gph/panel_b.gph" ///
@@ -366,8 +366,8 @@ grc1leg ///
     graphregion(color(white) margin(l=10 r=2 t=2 b=2)) ///
     name(figure1, replace)
 
-graph export "$root/picutres/figure1.pdf", replace
-graph export "$root/picutres/figure1.png", replace width(3300)
+graph export "$root/figures/figure1.pdf", replace
+graph export "$root/figures/figure1.png", replace width(3300)
 graph close _all
 ```
 
@@ -380,7 +380,7 @@ clear all
 set scheme white_tableau
 graph set window fontface "Helvetica"
 global C_SHADE "238 238 238"  ;  global C_GREY "85 85 85"
-global root "/Users/sunmengge/Dropbox/GitHub/sicence nationism/code"
+do "../config.do"
 
 * Step 1: 做图例 panel（中性灰）
 clear  ;  set obs 5  ;  gen year = 2010 + _n  ;  gen v1 = .  ;  gen v2 = .
@@ -417,8 +417,8 @@ graph combine ///
     graphregion(color(white) margin(l=10 r=2 t=2 b=2)) ///
     name(figure1, replace)
 
-graph export "$root/picutres/figure1.pdf", replace
-graph export "$root/picutres/figure1.png", replace width(3300)
+graph export "$root/figures/figure1.pdf", replace
+graph export "$root/figures/figure1.png", replace width(3300)
 graph close _all
 ```
 
@@ -446,15 +446,15 @@ graph close _all
 
 ## 八、给 Claude Code 的指令
 
-> 请对我的 Stata 项目做完整重构，项目根目录：`/Users/sunmengge/Dropbox/GitHub/sicence nationism/code/`，Stata 18，macOS。
+> 请对我的 Stata 项目做完整重构，项目根目录：``，Stata 18，macOS。
 >
 > **重构范围：** 将以下 6 个"分析+可视化混合"do 文件拆分为 `analysis/` 和 `plot/` 两层：
-> - `Brexit-stata_external_try/total_publications/compare.do` → `analysis/01` + `plot/p01`
-> - `Brexit-stata_external_try/intl_ratio/compare_intl_ratio.do` → `analysis/02` + `plot/p02`
-> - `crimes/total_publications/compare_total.do` → `analysis/03` + `plot/p03`
-> - `crimes/intl_ratio/intl_ratio_compare.do` → `analysis/04` + `plot/p04`
-> - `crimes_2015_2022/total_publications/compare_total_2022.do` → `analysis/05` + `plot/p05`
-> - `crimes_2015_2022/intl_ratio/intl_ratio_compare.do` → `analysis/06` + `plot/p06`
+> - `01_scm_brexit/total_publications/compare.do` → `analysis/01` + `plot/p01`
+> - `01_scm_brexit/intl_ratio/compare_intl_ratio.do` → `analysis/02` + `plot/p02`
+> - `01_scm_crimea_2014/total_publications/compare_total.do` → `analysis/03` + `plot/p03`
+> - `01_scm_crimea_2014/intl_ratio/intl_ratio_compare.do` → `analysis/04` + `plot/p04`
+> - `01_scm_war_2022/total_publications/compare_total_2022.do` → `analysis/05` + `plot/p05`
+> - `01_scm_war_2022/intl_ratio/intl_ratio_compare.do` → `analysis/06` + `plot/p06`
 >
 > **分析层：** 保留所有 SCM 代码，末尾按第二节模板提取结果存为 `results/*.dta`。
 >
